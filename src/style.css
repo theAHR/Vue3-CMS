@@ -1,0 +1,37 @@
+@font-face {
+  font-family: 'YekanRegular';
+  src: url('./assets/fonts/woff/IRANYekanX-Regular.woff') format('woff');
+}
+@font-face {
+  font-family: 'YekanMedium';
+  src: url('./assets/fonts/woff/IRANYekanX-Medium.woff') format('woff');
+}
+@font-face {
+  font-family: 'YekanDemiBold';
+  src: url('./assets/fonts/woff/IRANYekanX-DemiBold.woff') format('woff');
+}
+@font-face {
+  font-family: 'YekanBold';
+  src: url('./assets/fonts/woff/IRANYekanX-Bold.woff') format('woff');
+}
+@font-face {
+  font-family: 'YekanExtraBold';
+  src: url('./assets/fonts/woff/IRANYekanX-ExtraBold.woff') format('woff');
+}
+@font-face {
+  font-family: 'YekanBlack';
+  src: url('./assets/fonts/woff/IRANYekanX-Black.woff') format('woff');
+}
+html {
+  direction: rtl;
+  font-family: YekanRegular;
+  background-color: #ffffff;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;  /* IE and Edge */
+}
+html::-webkit-scrollbar { 
+  display: none;  /* Safari and Chrome */
+}
+button {
+  font-family: YekanRegular;
+}
