@@ -26,11 +26,11 @@ html {
   direction: rtl;
   font-family: YekanRegular;
   background-color: #ffffff;
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 html::-webkit-scrollbar { 
-  display: none;  /* Safari and Chrome */
+  display: none; 
 }
 button {
   font-family: YekanRegular;

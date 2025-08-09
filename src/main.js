@@ -3,15 +3,12 @@ import { createPinia } from 'pinia'
 import App from './App.vue'
 import router from './router'
 
-// Vuetify
 import { createVuetify } from 'vuetify'
-import 'vuetify/styles' // Global CSS has to be imported first
+import 'vuetify/styles'
 import { aliases, mdi } from 'vuetify/iconsets/mdi'
 
-// Import your custom styles AFTER Vuetify styles
 import './style.css'
 
-// Create vuetify instance
 const vuetify = createVuetify({
   icons: {
     defaultSet: 'mdi',
@@ -22,12 +19,11 @@ const vuetify = createVuetify({
   },
 })
 
-// Create Vue app
 const app = createApp(App)
 const pinia = createPinia()
 
 app.use(pinia)
 app.use(router)
-app.use(vuetify) // Add Vuetify after app is created
+app.use(vuetify)
 
 app.mount('#app')
