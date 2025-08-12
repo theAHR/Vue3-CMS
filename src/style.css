@@ -22,16 +22,70 @@
   font-family: 'YekanBlack';
   src: url('./assets/fonts/woff/IRANYekanX-Black.woff') format('woff');
 }
+
+/* Global reset and base styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 html {
   direction: rtl;
   font-family: YekanRegular;
   background-color: #ffffff;
   scrollbar-width: none;
   -ms-overflow-style: none;
+  height: 100%;
 }
+
+body {
+  height: 100%;
+  overflow-x: hidden;
+}
+
 html::-webkit-scrollbar { 
   display: none; 
 }
+
 button {
   font-family: YekanRegular;
+}
+
+/* Admin interface specific styles */
+#app {
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Ensure proper font rendering */
+.navigation-menu {
+  font-family: YekanRegular;
+}
+
+/* Smooth transitions for better UX */
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Debug styles to ensure menu visibility */
+.layout-container {
+  display: flex !important;
+  min-height: 100vh !important;
+}
+
+.navigation-menu {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  z-index: 1000 !important;
+}
+
+/* Override any Vuetify styles that might interfere */
+.v-application {
+  background: transparent !important;
+}
+
+.v-main {
+  padding: 0 !important;
 }
