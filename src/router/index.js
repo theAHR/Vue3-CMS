@@ -10,42 +10,92 @@ const routes = [
       {
         path: '/dashboard',
         component: () => import('@/pages/dashboard/index.vue'),
-        name: 'Dashboard'
+        name: 'داشبورد'
       },
       {
-        path: '/users',
-        component: () => import('@/pages/user/index.vue'),
-        name: 'User'
+        path: '/news/list',
+        component: () => import('@/pages/news/index.vue'),
+        name: 'خبر'
       },
       {
-        path: '/roles',
-        component: () => import('@/pages/role/index.vue'),
-        name: 'Role'
+        path: '/news/categories',
+        component: () => import('@/pages/newsCategory/index.vue'),
+        name: 'دسته‌بندی'
       },
       {
-        path: '/faq-group',
-        component: () => import('@/pages/faqCategory/index.vue'),
-        name: 'FaqCategory'
+        path: '/announcements/list',
+        component: () => import('@/pages/announcement/index.vue'),
+        name: 'اطلاعیه‌ها'
+      },
+      {
+        path: '/announcements/categories',
+        component: () => import('@/pages/announcementCategory/index.vue'),
+        name: 'دسته‌بندی'
+      },
+      {
+        path: '/circulars/list',
+        component: () => import('@/pages/circular/index.vue'),
+        name: 'بخشنامه‌ها'
+      },
+      {
+        path: '/circulars/categories',
+        component: () => import('@/pages/circularCategory/index.vue'),
+        name: 'دسته‌بندی'
+      },
+      {
+        path: '/instructions/list',
+        component: () => import('@/pages/instruction/index.vue'),
+        name: 'دستورالعمل‌ها'
+      },
+      {
+        path: '/instructions/categories',
+        component: () => import('@/pages/instructionCategory/index.vue'),
+        name: 'دسته‌بندی'
       },
       {
         path: '/faq',
         component: () => import('@/pages/faq/index.vue'),
-        name: 'Faq'
+        name: 'لیست سوالات'
+      },
+      {
+        path: '/faq-group',
+        component: () => import('@/pages/faqCategory/index.vue'),
+        name: 'دسته‌بندی'
+      },
+      {
+        path: '/job',
+        component: () => import('@/pages/job/index.vue'),
+        name: 'بخش سازمانی'
       },
       {
         path: '/job-sections',
         component: () => import('@/pages/jobSection/index.vue'),
-        name: 'JobSection'
-      },
-      {
-        path: '/jobs',
-        component: () => import('@/pages/job/index.vue'),
-        name: 'Job'
+        name: 'مشاغل'
       },
       {
         path: '/job-requests',
         component: () => import('@/pages/jobRequest/index.vue'),
-        name: 'JobRequest'
+        name: 'درخواست‌ها'
+      },
+      {
+        path: '/multimedia',
+        component: () => import('@/pages/multimedia/index.vue'),
+        name: 'ویدئوهای آموزشی'
+      },
+      {
+        path: '/guide',
+        component: () => import('@/pages/guide/index.vue'),
+        name: 'راهنما'
+      },
+      {
+        path: '/contact-requests',
+        component: () => import('@/pages/contactRequest/index.vue'),
+        name: 'درخواست‌های تماس'
+      },
+      {
+        path: '/rate-and-review',
+        component: () => import('@/pages/rateAndReview/index.vue'),
+        name: 'نظرات کاربران'
       },
       {
         path: '/social-networks',
@@ -53,54 +103,19 @@ const routes = [
         name: 'SocialNetwork'
       },
       {
-        path: '/contact-requests',
-        component: () => import('@/pages/contactRequest/index.vue'),
-        name: 'ContactRequest'
+        path: '/users',
+        component: () => import('@/pages/user/index.vue'),
+        name: 'کاربران'
       },
       {
-        path: '/guides',
-        component: () => import('@/pages/guide/index.vue'),
-        name: 'Guide'
+        path: '/roles',
+        component: () => import('@/pages/role/index.vue'),
+        name: 'نقش'
       },
       {
-        path: '/multimedia',
-        component: () => import('@/pages/multimedia/index.vue'),
-        name: 'Multimedia'
-      },
-      {
-        path: '/rate-and-review',
-        component: () => import('@/pages/rateAndReview/index.vue'),
-        name: 'RateAndReview'
-      },
-      {
-        path: '/news/categories',
-        component: () => import('@/pages/newsCategory/index.vue'),
-        name: 'NewsCategory'
-      },
-      {
-        path: '/news/list',
-        component: () => import('@/pages/news/index.vue'),
-        name: 'News'
-      },
-      {
-        path: '/announcements/categories',
-        component: () => import('@/pages/announcementCategory/index.vue'),
-        name: 'AnnouncementCategory'
-      },
-      {
-        path: '/announcements/list',
-        component: () => import('@/pages/announcement/index.vue'),
-        name: 'Announcement'
-      },
-      {
-        path: '/circulars/categories',
-        component: () => import('@/pages/circularCategory/index.vue'),
-        name: 'CircularCategory'
-      },
-      {
-        path: '/circulars/list',
-        component: () => import('@/pages/circular/index.vue'),
-        name: 'Circular'
+        path: '/account/profile',
+        component: () => import('@/pages/account/profile.vue'),
+        name: 'AccountProfile'
       },
       {
         path: '/account/auth',
@@ -111,11 +126,6 @@ const routes = [
         path: '/account/logout',
         component: () => import('@/pages/account/logout.vue'),
         name: 'AccountLogout'
-      },
-      {
-        path: '/account/profile',
-        component: () => import('@/pages/account/profile.vue'),
-        name: 'AccountProfile'
       }
     ]
   },

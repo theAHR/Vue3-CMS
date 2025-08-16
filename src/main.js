@@ -17,6 +17,15 @@ const vuetify = createVuetify({
       mdi,
     },
   },
+  rtl: true,
+  theme: {
+    defaultTheme: 'light',
+  },
+  defaults: {
+    global: {
+      ripple: false,
+    },
+  },
 })
 
 const app = createApp(App)
