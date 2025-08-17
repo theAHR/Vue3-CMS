@@ -20,7 +20,7 @@ const routes = [
       {
         path: '/news/categories',
         component: () => import('@/pages/newsCategory/index.vue'),
-        name: 'دسته‌بندی'
+        name: 'دسته‌بندی اخبار'
       },
       {
         path: '/announcements/list',
@@ -30,7 +30,7 @@ const routes = [
       {
         path: '/announcements/categories',
         component: () => import('@/pages/announcementCategory/index.vue'),
-        name: 'دسته‌بندی'
+        name: 'دسته‌بندی اطلاعیه‌ها'
       },
       {
         path: '/circulars/list',
@@ -40,7 +40,7 @@ const routes = [
       {
         path: '/circulars/categories',
         component: () => import('@/pages/circularCategory/index.vue'),
-        name: 'دسته‌بندی'
+        name: 'دسته‌بندی بخشنامه‌ها'
       },
       {
         path: '/instructions/list',
@@ -50,7 +50,7 @@ const routes = [
       {
         path: '/instructions/categories',
         component: () => import('@/pages/instructionCategory/index.vue'),
-        name: 'دسته‌بندی'
+        name: 'دسته‌بندی دستورالعمل‌ها'
       },
       {
         path: '/faq',

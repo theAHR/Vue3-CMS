@@ -1,13 +1,13 @@
 <template>
-  <div>
-    <h1>Dashboard</h1>
-  </div>
+  
 </template>
 
-<script setup>
-// Dashboard component
+<script>
+export default {
+
+}
 </script>
 
-<style scoped>
-/* Dashboard styles */
-</style> 
+<style>
+
+</style>

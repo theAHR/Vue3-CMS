@@ -10,7 +10,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
-import NavigationMenu from '@/components/NavigationMenu.vue'
+import NavigationMenu from '@/components/NavigationMenu/NavigationMenu.vue'
 
 const route = useRoute()
 
@@ -33,7 +33,6 @@ const showIntro = computed(() => {
   min-height: 100vh;
 }
 
-/* Responsive design */
 @media (max-width: 768px) {
   .layout-container {
     flex-direction: column;
