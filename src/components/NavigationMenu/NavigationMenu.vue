@@ -265,17 +265,7 @@ const systemMenuItems = [
       { title: "کاربران", to: "/users" },
       { title: "نقش‌ها", to: "/roles" },
     ],
-  },
-  {
-    title: "حساب کاربری",
-    key: "account",
-    icon: icons.user,
-    paths: ["/account"],
-    children: [
-      { title: "پروفایل", to: "/account/profile" },
-      { title: "احراز هویت", to: "/account/auth" },
-    ],
-  },
+  }
 ];
 
 function toggle(key) {
