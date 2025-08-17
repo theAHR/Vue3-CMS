@@ -46,7 +46,7 @@
             @click="handleMenuClick"
           >
             <div class="icon-container">
-              <svg class="icon" viewBox="0 0 24 24" fill="currentColor" v-html="item.icon"></svg>
+              <img :src="item.icon" class="icon" :alt="item.title" />
             </div>
             <span class="menu-text">{{ item.title }}</span>
             <div class="menu-badge" v-if="item.badge">{{ item.badge }}</div>
@@ -59,7 +59,7 @@
               :class="{ active: isParentActive(item.paths) }"
             >
               <div class="icon-container">
-                <svg class="icon" viewBox="0 0 24 24" fill="currentColor" v-html="item.icon"></svg>
+                <img :src="item.icon" class="icon" :alt="item.title" />
               </div>
               <span class="menu-text">{{ item.title }}</span>
               <div class="accordion-arrow" :class="{ open: open[item.key] }">
@@ -98,7 +98,7 @@
             @click="handleMenuClick"
           >
             <div class="icon-container">
-              <svg class="icon" viewBox="0 0 24 24" fill="currentColor" v-html="item.icon"></svg>
+              <img :src="item.icon" class="icon" :alt="item.title" />
             </div>
             <span class="menu-text">{{ item.title }}</span>
           </router-link>
@@ -110,7 +110,7 @@
               :class="{ active: isParentActive(item.paths) }"
             >
               <div class="icon-container">
-                <svg class="icon" viewBox="0 0 24 24" fill="currentColor" v-html="item.icon"></svg>
+                <img :src="item.icon" class="icon" :alt="item.title" />
               </div>
               <span class="menu-text">{{ item.title }}</span>
               <div class="accordion-arrow" :class="{ open: open[item.key] }">
@@ -162,21 +162,38 @@ import { useRoute } from "vue-router";
 // Import profile image
 import HajAmir from "@/assets/img/img/HajAmir.jpg";
 
-// Icon SVG paths
+// Import icon SVGs
+import homeIcon from "@/assets/img/icons/home.svg";
+import newsIcon from "@/assets/img/icons/news.svg";
+import announcementIcon from "@/assets/img/icons/announcement.svg";
+import circularIcon from "@/assets/img/icons/circular.svg";
+import instructionIcon from "@/assets/img/icons/instruction.svg";
+import faqIcon from "@/assets/img/icons/faq.svg";
+import jobIcon from "@/assets/img/icons/job.svg";
+import mediaIcon from "@/assets/img/icons/media.svg";
+import guideIcon from "@/assets/img/icons/guide-icon.svg";
+import contactIcon from "@/assets/img/icons/contact.svg";
+import socialIcon from "@/assets/img/icons/social.svg";
+import userIcon from "@/assets/img/icons/user.svg";
+import roleIcon from "@/assets/img/icons/role.svg";
+import commentIcon from "@/assets/img/icons/comment.svg";
+
+// Icon mapping
 const icons = {
-  home: '<path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>',
-  news: '<path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-5 14H4v-4h11v4zm0-5H4V9h11v4zm5 5h-4V9h4v9z"/>',
-  announcement: '<path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>',
-  circular: '<path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8V4h6v4h4v10z"/>',
-  instruction: '<path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>',
-  faq: '<path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 16h2v-2h-2v2zm0-4h2V6h-2v8z"/>',
-  job: '<path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"/>',
-  media: '<path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/>',
-  guide: '<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>',
-  contact: '<path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>',
-  rate: '<path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 9c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm7 8H6v-1.4c0-2 4-3.1 6-3.1s6 1.1 6 3.1V19z"/>',
-  social: '<path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>',
-  user: '<path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>'
+  home: homeIcon,
+  news: newsIcon,
+  announcement: announcementIcon,
+  circular: circularIcon,
+  instruction: instructionIcon,
+  faq: faqIcon,
+  job: jobIcon,
+  media: mediaIcon,
+  guide: guideIcon,
+  contact: contactIcon,
+  social: socialIcon,
+  user: userIcon,
+  role: roleIcon,
+  comment: commentIcon
 };
 
 const route = useRoute();
@@ -250,7 +267,7 @@ const mainMenuItems = [
   { title: "ویدئوهای آموزشی", to: "/multimedia", icon: icons.media },
   { title: "راهنما", to: "/guide", icon: icons.guide },
   { title: "درخواست‌های تماس", to: "/contact-requests", icon: icons.contact },
-  { title: "نظرات کاربران", to: "/rate-and-review", icon: icons.rate },
+  { title: "نظرات کاربران", to: "/rate-and-review", icon: icons.comment },
   { title: "شبکه‌های اجتماعی", to: "/social-networks", icon: icons.social },
 ];
 
@@ -540,7 +557,18 @@ watch(() => route.path, autoOpen, { immediate: true });
 .icon {
   width: 20px;
   height: 20px;
-  color: currentColor;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+  opacity: 0.8;
+  transition: all 0.3s ease;
+}
+
+.menu-link:hover .icon,
+.accordion-header:hover .icon,
+.menu-link.active .icon,
+.accordion-header.active .icon {
+  opacity: 1;
+  filter: brightness(0) invert(1);
 }
 
 .menu-text {
