@@ -1,36 +1,21 @@
 <template>
-  <!-- Mobile Hamburger Button -->
-  <button 
-    class="mobile-hamburger" 
-    @click="toggleMobileSidebar"
-    :class="{ active: isMobileSidebarOpen }"
-    aria-label="منوی موبایل"
-  >
-    <span></span>
-    <span></span>
-    <span></span>
-  </button>
-
   <!-- Mobile Overlay -->
   <div 
+    v-if="appStore.isMobileSidebarOpen" 
     class="mobile-overlay" 
-    :class="{ active: isMobileSidebarOpen }"
-    @click="closeMobileSidebar"
+    @click="appStore.closeMobileSidebar"
   ></div>
 
   <!-- Sidebar Navigation -->
-  <aside class="sidebar" :class="{ 'mobile-open': isMobileSidebarOpen }">
+  <aside class="sidebar" :class="{ 'mobile-open': appStore.isMobileSidebarOpen }">
     <!-- Sidebar Header -->
     <div class="sidebar-header">
       <div class="logo-container">
         <div class="logo-icon">
-          <svg viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-          </svg>
+          <img src="@/assets/img/img/white-logo.png" alt="لوگو" class="logo-image" />
         </div>
-        <h2 class="logo-text">پنل مدیریت</h2>
+        <h2 class="logo-text"> پنل مدیریت محتوا</h2>
       </div>
-      <p class="header-subtitle">سیستم مدیریت محتوا</p>
     </div>
 
     <!-- Navigation Menu -->
@@ -106,6 +91,7 @@
 <script setup>
 import { ref, watch, onMounted, onUnmounted } from "vue";
 import { useRoute } from "vue-router";
+import { useAppStore } from "@/stores/app";
 
 // Import profile image
 import HajAmir from "@/assets/img/img/HajAmir.jpg";
@@ -145,10 +131,9 @@ const icons = {
 };
 
 const route = useRoute();
+const appStore = useAppStore();
 const open = ref({});
-const isMobileSidebarOpen = ref(false);
 
-// Main menu items
 const mainMenuItems = [
   { title: "داشبورد", to: "/dashboard", icon: icons.home, badge: "جدید" },
   {
@@ -249,23 +234,15 @@ function autoOpen() {
   });
 }
 
-function toggleMobileSidebar() {
-  isMobileSidebarOpen.value = !isMobileSidebarOpen.value;
-}
-
-function closeMobileSidebar() {
-  isMobileSidebarOpen.value = false;
-}
-
 function handleMenuClick() {
   if (window.innerWidth <= 768) {
-    closeMobileSidebar();
+    appStore.closeMobileSidebar();
   }
 }
 
 function handleResize() {
   if (window.innerWidth > 768) {
-    isMobileSidebarOpen.value = false;
+    appStore.closeMobileSidebar();
   }
 }
 
@@ -281,52 +258,18 @@ watch(() => route.path, autoOpen, { immediate: true });
 </script>
 
 <style scoped>
-/* Mobile Hamburger Button */
-.mobile-hamburger {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  z-index: 1001;
-  width: 50px;
-  height: 50px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border: none;
-  border-radius: 12px;
-  display: none;
+/* Sidebar */
+.sidebar {
+  width: 300px;
+  height: 100vh;
+  background: linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  color: #ffffff;
+  display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 4px;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
-}
-
-.mobile-hamburger:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 25px rgba(102, 126, 234, 0.4);
-}
-
-.mobile-hamburger span {
-  width: 22px;
-  height: 2px;
-  background: #fff;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  transform-origin: center;
-  border-radius: 1px;
-}
-
-.mobile-hamburger.active span:nth-child(1) {
-  transform: rotate(45deg) translate(6px, 6px);
-}
-
-.mobile-hamburger.active span:nth-child(2) {
-  opacity: 0;
-  transform: scale(0);
-}
-
-.mobile-hamburger.active span:nth-child(3) {
-  transform: rotate(-45deg) translate(6px, -6px);
+  position: fixed;
+  z-index: 1000;
+  transition: transform 0.3s ease;
+  font-family: YekanRegular, 'YekanRegular', sans-serif;
 }
 
 /* Mobile Overlay */
@@ -339,29 +282,7 @@ watch(() => route.path, autoOpen, { immediate: true });
   background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(4px);
   z-index: 999;
-  opacity: 0;
-  visibility: hidden;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.mobile-overlay.active {
-  opacity: 1;
-  visibility: visible;
-}
-
-/* Sidebar */
-.sidebar {
-  width: 300px;
-  height: 100vh;
-  background: linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-  color: #ffffff;
-  display: flex;
-  flex-direction: column;
-  position: fixed;
-  z-index: 1000;
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
 }
 
 /* Sidebar Header */
@@ -391,26 +312,25 @@ watch(() => route.path, autoOpen, { immediate: true });
   color: white;
 }
 
-.logo-icon svg {
+.logo-icon .logo-image {
   width: 24px;
   height: 24px;
+  object-fit: contain;
 }
 
 .logo-text {
   margin: 0;
-  font-size: 1.3rem;
+  font-size: 1.25rem;
   font-weight: 700;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: white;
+  font-family: YekanRegular, 'YekanRegular', sans-serif;
 }
 
 .header-subtitle {
-  margin: 0;
+  margin: 4px 0 0 0;
   font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.7);
-  font-weight: 400;
+  color: rgba(255, 255, 255, 0.8);
+  font-family: YekanRegular, 'YekanRegular', sans-serif;
 }
 
 /* Menu */
@@ -523,6 +443,7 @@ watch(() => route.path, autoOpen, { immediate: true });
   flex: 1;
   font-size: 0.95rem;
   font-weight: 500;
+  font-family: YekanRegular, 'YekanRegular', sans-serif;
 }
 
 .menu-badge {
@@ -658,22 +579,20 @@ watch(() => route.path, autoOpen, { immediate: true });
   font-size: 1rem;
   font-weight: 600;
   color: #fff;
+  font-family: YekanRegular, 'YekanRegular', sans-serif;
 }
 
 .profile-role {
   margin: 0;
   font-size: 0.85rem;
   color: rgba(255, 255, 255, 0.7);
+  font-family: YekanRegular, 'YekanRegular', sans-serif;
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
-  .mobile-hamburger {
-    display: flex;
-  }
-
   .sidebar {
-    width: 85%;
+    width: 60%;
     transform: translateX(100%);
   }
 
@@ -714,20 +633,9 @@ watch(() => route.path, autoOpen, { immediate: true });
 
 @media (max-width: 480px) {
   .sidebar {
-    width: 90%;
+    width: 70%;
   }
   
-  .mobile-hamburger {
-    width: 45px;
-    height: 45px;
-    top: 15px;
-    right: 15px;
-  }
-  
-  .mobile-hamburger span {
-    width: 20px;
-  }
-
   .logo-text {
     font-size: 1rem;
   }
@@ -739,7 +647,7 @@ watch(() => route.path, autoOpen, { immediate: true });
 
 @media (max-width: 360px) {
   .sidebar {
-    width: 95%;
+    width: 60%;
   }
 
   .sidebar-header {

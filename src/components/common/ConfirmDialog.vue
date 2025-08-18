@@ -189,18 +189,19 @@ const handleOverlayClick = () => {
 }
 
 .dialog-title {
-  margin: 0 0 12px 0;
-  font-size: 24px;
-  font-weight: 700;
+  margin: 0 0 16px 0;
+  font-size: 1.25rem;
+  font-weight: 600;
   color: #2d3748;
-  line-height: 1.3;
+  font-family: YekanRegular, 'YekanRegular', sans-serif;
 }
 
 .dialog-message {
-  margin: 0;
-  font-size: 16px;
-  color: #718096;
-  line-height: 1.6;
+  margin: 0 0 24px 0;
+  font-size: 1rem;
+  color: #4a5568;
+  line-height: 1.5;
+  font-family: YekanRegular, 'YekanRegular', sans-serif;
 }
 
 .dialog-actions {
@@ -224,6 +225,7 @@ const handleOverlayClick = () => {
   justify-content: center;
   gap: 8px;
   min-height: 48px;
+  font-family: YekanRegular, 'YekanRegular', sans-serif;
 }
 
 .btn:disabled {

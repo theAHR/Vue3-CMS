@@ -87,8 +87,10 @@ const hide = (id) => {
 
 .snackbar-message {
   flex: 1;
-  font-size: 14px;
-  color: #2d3748;
+  font-size: 0.9rem;
+  color: #272727;
+  line-height: 1.4;
+  font-family: YekanRegular, 'YekanRegular', sans-serif;
 }
 
 .snackbar-close {

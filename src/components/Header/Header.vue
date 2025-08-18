@@ -13,6 +13,14 @@
       @cancel="showLogoutConfirm = false"
     />
     <div class="header-content">
+      <div class="header-left">
+        <!-- Hamburger Menu for Mobile -->
+        <button class="hamburger-menu" @click="toggleSidebar" title="منو">
+          <svg class="hamburger-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+          </svg>
+        </button>
+      </div>
       <div class="header-right">
         <!-- Notifications -->
         <div class="header-actions">
@@ -31,35 +39,13 @@
             <span v-if="messageCount > 0" class="message-badge">{{ messageCount }}</span>
           </button>
 
-          <!-- Quick Actions -->
-          <div class="quick-actions">
-            <button class="action-button quick-btn" @click="showQuickActions = !showQuickActions">
-              <svg class="action-icon" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+          <!-- Profile Button -->
+          <div class="profile-section">
+            <button class="action-button profile-btn" @click="navigateTo('/account/profile')" title="پروفایل">
+              <svg class="action-icon" viewBox="0 0 67 67" fill="currentColor">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M27.6433 66.1886C29.5769 66.4971 31.4675 66.6495 33.3621 66.6495C42.1707 66.6495 50.5181 63.2511 56.8541 56.9151C64.5846 49.1846 67.9831 38.5601 66.2057 27.7041C63.9245 13.9461 52.7217 2.7431 38.9637 0.462097C28.1087 -1.3152 17.4437 2.0832 9.75267 9.8137C2.06517 17.5403 -1.33733 28.1657 0.479267 39.0247C2.76047 52.7397 13.9283 63.9076 27.6433 66.1886ZM14.6233 54.8296C14.3889 54.5952 14.1975 54.4038 13.967 54.2085H14.0022V52.6265C14.0022 46.2124 19.1819 41.0325 25.5572 41.0325H41.0532C47.4673 41.0325 52.6432 46.2513 52.6432 52.6265V54.2476C52.526 54.3648 52.4127 54.4702 52.2955 54.5757C52.1783 54.6851 52.065 54.7905 51.9479 54.9038L51.8307 54.9819C46.6549 59.3881 40.1627 61.8217 33.3227 61.8217C26.4829 61.8217 19.9167 59.3881 14.7757 54.9428L14.6233 54.8296ZM24.553 15.3766C26.7952 12.8258 29.9241 11.4352 33.2835 11.4352L33.3225 11.4742C34.0569 11.4742 34.8303 11.5133 35.5647 11.6695C40.0842 12.5172 43.8342 16.2672 44.6819 20.7867C45.4554 24.9195 44.0647 29.0172 40.9358 31.7597C37.8069 34.4667 33.5178 35.3144 29.4588 34.0019C26.1346 32.9199 23.3924 30.1777 22.3104 26.8535C20.9979 22.7597 21.8108 18.4708 24.553 15.3766Z" fill="currentColor"/>
               </svg>
             </button>
-            
-            <!-- Quick Actions Dropdown -->
-            <div v-if="showQuickActions" class="quick-actions-dropdown">
-              <div class="dropdown-item" @click="navigateTo('/dashboard')">
-                <svg class="dropdown-icon" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
-                </svg>
-                <span>داشبورد</span>
-              </div>
-              <div class="dropdown-item" @click="navigateTo('/guide')">
-                <svg class="dropdown-icon" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                </svg>
-                <span>راهنما</span>
-              </div>
-              <div class="dropdown-item" @click="navigateTo('/account/profile')">
-                <svg class="dropdown-icon" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                </svg>
-                <span>پروفایل</span>
-              </div>
-            </div>
           </div>
         </div>
 
@@ -155,16 +141,17 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { useAppStore } from '@/stores/app';
 import ConfirmDialog from '../common/ConfirmDialog.vue';
 
 const route = useRoute();
 const router = useRouter();
+const appStore = useAppStore();
 
 // Reactive data
 const searchQuery = ref('');
 const showNotifications = ref(false);
 const showMessages = ref(false);
-const showQuickActions = ref(false);
 const isLoggingOut = ref(false);
 const showLogoutConfirm = ref(false);
 
@@ -255,6 +242,10 @@ const currentSubPage = computed(() => {
 });
 
 // Methods
+const toggleSidebar = () => {
+  appStore.toggleMobileSidebar();
+};
+
 const handleSearch = () => {
   // Implement search functionality
   console.log('Searching for:', searchQuery.value);
@@ -264,7 +255,6 @@ const toggleNotifications = () => {
   showNotifications.value = !showNotifications.value;
   if (showNotifications.value) {
     showMessages.value = false;
-    showQuickActions.value = false;
   }
 };
 
@@ -272,13 +262,11 @@ const toggleMessages = () => {
   showMessages.value = !showMessages.value;
   if (showMessages.value) {
     showNotifications.value = false;
-    showQuickActions.value = false;
   }
 };
 
 const navigateTo = (path) => {
   router.push(path);
-  showQuickActions.value = false;
 };
 
 const handleLogoutConfirm = async () => {
@@ -320,7 +308,6 @@ const handleClickOutside = (event) => {
   if (!event.target.closest('.header')) {
     showNotifications.value = false;
     showMessages.value = false;
-    showQuickActions.value = false;
   }
 };
 
@@ -346,19 +333,49 @@ onUnmounted(() => {
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
   z-index: 999;
   transition: right 0.3s ease;
+  font-family: YekanRegular, 'YekanRegular', sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
 }
 
 .header-content {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 100%;
-  padding: 0 25px;
+  width: 100%;
 }
 
 /* Left Section */
 .header-left {
-  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.hamburger-menu {
+  width: 42px;
+  height: 42px;
+  border: none;
+  border-radius: 12px;
+  background: #f8f9fa;
+  color: #6c757d;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.hamburger-menu:hover {
+  background: #e9ecef;
+  color: #495057;
+  transform: translateY(-2px);
+}
+
+.hamburger-icon {
+  width: 20px;
+  height: 20px;
 }
 
 .breadcrumb {
@@ -466,11 +483,9 @@ onUnmounted(() => {
 
 /* Right Section */
 .header-right {
-  flex: 1;
   display: flex;
-  justify-content: flex-end;
   align-items: center;
-  gap: 15px;
+  gap: 16px;
 }
 
 .header-actions {
@@ -526,43 +541,22 @@ onUnmounted(() => {
   line-height: 1;
 }
 
-/* Quick Actions */
-.quick-actions {
-  position: relative;
-}
-
-.quick-actions-dropdown {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  margin-top: 10px;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-  border: 1px solid #e9ecef;
-  min-width: 180px;
-  z-index: 1000;
-  overflow: hidden;
-}
-
-.dropdown-item {
+/* Profile Section */
+.profile-section {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  cursor: pointer;
-  transition: background 0.2s ease;
-  color: #495057;
 }
 
-.dropdown-item:hover {
+.profile-btn {
   background: #f8f9fa;
+  color: #6c757d;
+  transition: all 0.3s ease;
 }
 
-.dropdown-icon {
-  width: 18px;
-  height: 18px;
-  color: #6c757d;
+.profile-btn:hover {
+  background: #e9ecef;
+  color: #495057;
+  transform: translateY(-2px);
 }
 
 /* Logout Section */
@@ -730,14 +724,16 @@ onUnmounted(() => {
   margin: 0 0 4px 0;
   font-size: 0.9rem;
   font-weight: 600;
-  color: #495057;
+  color: #2d3748;
+  font-family: YekanRegular, 'YekanRegular', sans-serif;
 }
 
 .notification-message {
   margin: 0 0 8px 0;
   font-size: 0.85rem;
-  color: #6c757d;
+  color: #4a5568;
   line-height: 1.4;
+  font-family: YekanRegular, 'YekanRegular', sans-serif;
 }
 
 .notification-time {
@@ -788,6 +784,7 @@ onUnmounted(() => {
   font-size: 0.9rem;
   font-weight: 600;
   color: #495057;
+  font-family: YekanRegular, 'YekanRegular', sans-serif;
 }
 
 .message-preview {
@@ -795,6 +792,7 @@ onUnmounted(() => {
   font-size: 0.85rem;
   color: #6c757d;
   line-height: 1.4;
+  font-family: YekanRegular, 'YekanRegular', sans-serif;
 }
 
 .message-time {
@@ -810,6 +808,21 @@ onUnmounted(() => {
   
   .header-content {
     padding: 0 15px;
+  }
+  
+  .header-left {
+    flex: 0 0 auto;
+  }
+  
+  .hamburger-menu {
+    display: flex;
+    width: 38px;
+    height: 38px;
+  }
+  
+  .hamburger-icon {
+    width: 18px;
+    height: 18px;
   }
   
   .search-container {
@@ -835,6 +848,21 @@ onUnmounted(() => {
   
   .header-content {
     padding: 0 10px;
+  }
+  
+  .header-left {
+    flex: 0 0 auto;
+  }
+  
+  .hamburger-menu {
+    display: flex;
+    width: 36px;
+    height: 36px;
+  }
+  
+  .hamburger-icon {
+    width: 16px;
+    height: 16px;
   }
   
   .search-container {

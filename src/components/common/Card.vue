@@ -243,8 +243,8 @@ const cardStyles = computed(() => {
   margin: 0;
   font-size: 1.1rem;
   font-weight: 600;
-  color: #495057;
-  flex: 1;
+  color: #2d3748;
+  font-family: YekanRegular, 'YekanRegular', sans-serif;
 }
 
 .card-badge {
@@ -362,6 +362,7 @@ const cardStyles = computed(() => {
   font-size: 0.9rem;
   font-weight: 500;
   color: #6c757d;
+  font-family: YekanRegular, 'YekanRegular', sans-serif;
 }
 
 @keyframes spin {

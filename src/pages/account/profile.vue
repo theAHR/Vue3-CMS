@@ -6,7 +6,12 @@
     </div>
     
     <div class="profile-content">
-      <div class="profile-card">
+      <div v-if="loading" class="loading-state">
+        <div class="loading-spinner"></div>
+        <p>در حال بارگذاری اطلاعات...</p>
+      </div>
+      
+      <div v-else class="profile-card">
         <div class="profile-avatar">
           <div class="avatar-placeholder">
             {{ userInitials }}
@@ -16,39 +21,44 @@
         <div class="profile-info">
           <div class="info-row">
             <label>نام:</label>
-            <span>{{ user.name || 'نامشخص' }}</span>
+            <span>{{ profileData.name || 'نامشخص' }}</span>
           </div>
           
           <div class="info-row">
             <label>نام خانوادگی:</label>
-            <span>{{ user.lastName || 'نامشخص' }}</span>
+            <span>{{ profileData.lastName || 'نامشخص' }}</span>
           </div>
           
           <div class="info-row">
             <label>نام کاربری:</label>
-            <span>{{ user.username || 'نامشخص' }}</span>
+            <span>{{ profileData.username || 'نامشخص' }}</span>
           </div>
           
           <div class="info-row">
             <label>شماره موبایل:</label>
-            <span>{{ user.mobileNo || 'نامشخص' }}</span>
+            <span>{{ profileData.mobileNo || 'نامشخص' }}</span>
           </div>
           
           <div class="info-row">
             <label>وضعیت:</label>
-            <span :class="['status', user.active ? 'active' : 'inactive']">
-              {{ user.active ? 'فعال' : 'غیرفعال' }}
+            <span :class="['status', profileData.active ? 'active' : 'inactive']">
+              {{ profileData.active ? 'فعال' : 'غیرفعال' }}
             </span>
           </div>
           
           <div class="info-row">
+            <label>نقش:</label>
+            <span>{{ profileData.roleId || 'نامشخص' }}</span>
+          </div>
+          
+          <div class="info-row">
             <label>تاریخ ایجاد:</label>
-            <span>{{ formatDate(user.createDate) }}</span>
+            <span>{{ formatDate(profileData.createDate) }}</span>
           </div>
           
           <div class="info-row">
             <label>آخرین بروزرسانی:</label>
-            <span>{{ formatDate(user.modifyDate) }}</span>
+            <span>{{ formatDate(profileData.modifyDate) }}</span>
           </div>
         </div>
       </div>
@@ -57,16 +67,18 @@
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useAccountStore } from '@/stores/account'
 
 const accountStore = useAccountStore()
+const profileData = ref({})
+const loading = ref(false)
 
 const user = computed(() => accountStore.getUser)
 
 const userInitials = computed(() => {
-  const name = user.value.name || ''
-  const lastName = user.value.lastName || ''
+  const name = profileData.value.name || ''
+  const lastName = profileData.value.lastName || ''
   return (name.charAt(0) + lastName.charAt(0)).toUpperCase()
 })
 
@@ -86,16 +98,26 @@ const formatDate = (dateString) => {
   }
 }
 
-onMounted(async () => {
+const fetchProfileData = async () => {
   if (!accountStore.getIsAuthenticate) {
     return
   }
   
+  loading.value = true
   try {
-    await accountStore.readUserInfo()
+    const response = await accountStore.readUserInfo()
+    if (response.data.success) {
+      profileData.value = response.data.object
+    }
   } catch (error) {
-    console.error('Error loading user info:', error)
+    console.error('Error loading profile data:', error)
+  } finally {
+    loading.value = false
   }
+}
+
+onMounted(() => {
+  fetchProfileData()
 })
 </script>
 
@@ -159,6 +181,36 @@ onMounted(async () => {
 
 .profile-info {
   flex: 1;
+}
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-state p {
+  color: #6c757d;
+  font-size: 16px;
+  margin: 0;
 }
 
 .info-row {

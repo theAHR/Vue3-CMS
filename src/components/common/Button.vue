@@ -299,6 +299,7 @@ const handleClick = (event) => {
 
 .button-text {
   font-weight: 500;
+  font-family: YekanRegular, 'YekanRegular', sans-serif;
 }
 
 .button-icon {
