@@ -7,8 +7,7 @@
     
     <div class="profile-content">
       <div v-if="loading" class="loading-state">
-        <div class="loading-spinner"></div>
-        <p>در حال بارگذاری اطلاعات...</p>
+        <Loading text="در حال بارگذاری اطلاعات..." />
       </div>
       
       <div v-else class="profile-card">
@@ -69,6 +68,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useAccountStore } from '@/stores/account'
+import Loading from '@/components/common/Loading.vue'
 
 const accountStore = useAccountStore()
 const profileData = ref({})
