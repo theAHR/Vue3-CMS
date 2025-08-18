@@ -1,24 +1,14 @@
 <template>
-  <!-- Mobile Overlay -->
-  <div 
-    v-if="appStore.isMobileSidebarOpen" 
-    class="mobile-overlay" 
-    @click="appStore.closeMobileSidebar"
-  ></div>
-
-  <!-- Sidebar Navigation -->
+  <div v-if="appStore.isMobileSidebarOpen" class="mobile-overlay" @click="appStore.closeMobileSidebar"></div>
   <aside class="sidebar" :class="{ 'mobile-open': appStore.isMobileSidebarOpen }">
-    <!-- Sidebar Header -->
     <div class="sidebar-header">
       <div class="logo-container">
         <div class="logo-icon">
           <img src="@/assets/img/img/white-logo.png" alt="لوگو" class="logo-image" />
         </div>
-        <h2 class="logo-text"> پنل مدیریت محتوا</h2>
+        <h2 class="logo-text">پنل مدیریت محتوا</h2>
       </div>
     </div>
-
-    <!-- Navigation Menu -->
     <nav class="menu" role="navigation">
       <div class="menu-section">
         <template v-for="item in [...mainMenuItems, ...systemMenuItems]" :key="item.title">
@@ -33,9 +23,7 @@
               <img :src="item.icon" class="icon" :alt="item.title" />
             </div>
             <span class="menu-text">{{ item.title }}</span>
-            <div class="menu-badge" v-if="item.badge">{{ item.badge }}</div>
           </router-link>
-
           <div v-else class="accordion">
             <div
               class="accordion-header"
@@ -48,7 +36,7 @@
               <span class="menu-text">{{ item.title }}</span>
               <div class="accordion-arrow" :class="{ open: open[item.key] }">
                 <svg viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
+                  <path d="M9 10l3 3 3-3"/>
                 </svg>
               </div>
             </div>
@@ -71,13 +59,10 @@
         </template>
       </div>
     </nav>
-
-    <!-- User Profile Section -->
     <div class="profile">
       <div class="profile-info">
         <div class="avatar-container">
           <img :src="HajAmir" class="avatar" alt="مدیر سیستم" />
-          <div class="status-indicator online"></div>
         </div>
         <div class="profile-details">
           <h3 class="profile-name">حاج امیر</h3>
@@ -89,30 +74,25 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted, onUnmounted } from "vue";
-import { useRoute } from "vue-router";
-import { useAppStore } from "@/stores/app";
+import { ref, watch, onMounted, onUnmounted } from "vue"
+import { useRoute } from "vue-router"
+import { useAppStore } from "@/stores/app"
+import HajAmir from "@/assets/img/img/HajAmir.jpg"
+import homeIcon from "@/assets/img/icons/home.svg"
+import newsIcon from "@/assets/img/icons/news.svg"
+import announcementIcon from "@/assets/img/icons/announcement.svg"
+import circularIcon from "@/assets/img/icons/circular.svg"
+import instructionIcon from "@/assets/img/icons/instruction.svg"
+import faqIcon from "@/assets/img/icons/faq.svg"
+import jobIcon from "@/assets/img/icons/job.svg"
+import mediaIcon from "@/assets/img/icons/media.svg"
+import guideIcon from "@/assets/img/icons/guide-icon.svg"
+import contactIcon from "@/assets/img/icons/contact.svg"
+import socialIcon from "@/assets/img/icons/social.svg"
+import userIcon from "@/assets/img/icons/user.svg"
+import roleIcon from "@/assets/img/icons/role.svg"
+import commentIcon from "@/assets/img/icons/comment.svg"
 
-// Import profile image
-import HajAmir from "@/assets/img/img/HajAmir.jpg";
-
-// Import icon SVGs
-import homeIcon from "@/assets/img/icons/home.svg";
-import newsIcon from "@/assets/img/icons/news.svg";
-import announcementIcon from "@/assets/img/icons/announcement.svg";
-import circularIcon from "@/assets/img/icons/circular.svg";
-import instructionIcon from "@/assets/img/icons/instruction.svg";
-import faqIcon from "@/assets/img/icons/faq.svg";
-import jobIcon from "@/assets/img/icons/job.svg";
-import mediaIcon from "@/assets/img/icons/media.svg";
-import guideIcon from "@/assets/img/icons/guide-icon.svg";
-import contactIcon from "@/assets/img/icons/contact.svg";
-import socialIcon from "@/assets/img/icons/social.svg";
-import userIcon from "@/assets/img/icons/user.svg";
-import roleIcon from "@/assets/img/icons/role.svg";
-import commentIcon from "@/assets/img/icons/comment.svg";
-
-// Icon mapping
 const icons = {
   home: homeIcon,
   news: newsIcon,
@@ -128,11 +108,11 @@ const icons = {
   user: userIcon,
   role: roleIcon,
   comment: commentIcon
-};
+}
 
-const route = useRoute();
-const appStore = useAppStore();
-const open = ref({});
+const route = useRoute()
+const appStore = useAppStore()
+const open = ref({})
 
 const mainMenuItems = [
   { title: "داشبورد", to: "/dashboard", icon: icons.home, badge: "جدید" },
@@ -202,9 +182,8 @@ const mainMenuItems = [
   { title: "درخواست‌های تماس", to: "/contact-requests", icon: icons.contact },
   { title: "نظرات کاربران", to: "/rate-and-review", icon: icons.comment },
   { title: "شبکه‌های اجتماعی", to: "/social-networks", icon: icons.social },
-];
+]
 
-// System management menu items
 const systemMenuItems = [
   {
     title: "مدیریت کاربران",
@@ -216,63 +195,62 @@ const systemMenuItems = [
       { title: "نقش‌ها", to: "/roles" },
     ],
   }
-];
+]
 
 function toggle(key) {
-  open.value[key] = !open.value[key];
+  open.value[key] = !open.value[key]
 }
 
 function isParentActive(paths) {
-  return paths.some((p) => route.path.startsWith(p));
+  return paths.some((p) => route.path.startsWith(p))
 }
 
 function autoOpen() {
   [...mainMenuItems, ...systemMenuItems].forEach((item) => {
     if (item.children && isParentActive(item.paths)) {
-      open.value[item.key] = true;
+      open.value[item.key] = true
     }
-  });
+  })
 }
 
 function handleMenuClick() {
   if (window.innerWidth <= 768) {
-    appStore.closeMobileSidebar();
+    appStore.closeMobileSidebar()
   }
 }
 
 function handleResize() {
   if (window.innerWidth > 768) {
-    appStore.closeMobileSidebar();
+    appStore.closeMobileSidebar()
   }
 }
 
 onMounted(() => {
-  window.addEventListener('resize', handleResize);
-});
-
+  window.addEventListener('resize', handleResize)
+})
 onUnmounted(() => {
-  window.removeEventListener('resize', handleResize);
-});
-
-watch(() => route.path, autoOpen, { immediate: true });
+  window.removeEventListener('resize', handleResize)
+})
+watch(() => route.path, autoOpen, { immediate: true })
 </script>
 
 <style scoped>
-/* Sidebar */
 .sidebar {
   width: 300px;
   height: 100vh;
-  background: linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-  color: #ffffff;
+  background: #18181c;
+  color: #fff;
   display: flex;
   flex-direction: column;
   position: fixed;
   z-index: 1000;
   transition: transform 0.3s ease;
   font-family: YekanRegular, 'YekanRegular', sans-serif;
+  right: 0;
+  top: 0;
+  transform: translateX(0);
 }
 
-/* Mobile Overlay */
 .mobile-overlay {
   position: fixed;
   top: 0;
@@ -285,45 +263,42 @@ watch(() => route.path, autoOpen, { immediate: true });
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Sidebar Header */
 .sidebar-header {
-  padding: 25px 20px;
+  padding: 18px 12px;
   text-align: center;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid #23232b;
+  background: none;
 }
 
 .logo-container {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  margin-bottom: 8px;
+  gap: 8px;
+  margin-bottom: 0;
 }
 
 .logo-icon {
-  width: 40px;
-  height: 40px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 12px;
+  width: 32px;
+  height: 32px;
+  background: #23232b;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
 }
 
 .logo-icon .logo-image {
-  width: 24px;
-  height: 24px;
+  width: 18px;
+  height: 18px;
   object-fit: contain;
 }
 
 .logo-text {
   margin: 0;
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: white;
-  font-family: YekanRegular, 'YekanRegular', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #fff;
 }
 
 .header-subtitle {
@@ -333,11 +308,10 @@ watch(() => route.path, autoOpen, { immediate: true });
   font-family: YekanRegular, 'YekanRegular', sans-serif;
 }
 
-/* Menu */
 .menu {
   flex: 1;
   overflow-y: auto;
-  padding: 20px 0;
+  padding: 10px 0;
 }
 
 .menu::-webkit-scrollbar {
@@ -358,7 +332,7 @@ watch(() => route.path, autoOpen, { immediate: true });
 }
 
 .menu-section {
-  margin-bottom: 25px;
+  margin-bottom: 0;
 }
 
 .menu-section-title {
@@ -372,78 +346,53 @@ watch(() => route.path, autoOpen, { immediate: true });
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* Menu Links */
 .menu-link,
 .accordion-header {
-  position: relative;
   display: flex;
   align-items: center;
-  padding: 14px 20px;
-  gap: 14px;
-  color: rgba(255, 255, 255, 0.8);
+  padding: 10px 14px;
+  gap: 10px;
+  color: #d1d1d6;
   text-decoration: none;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  cursor: pointer;
-  border-radius: 0 25px 25px 0;
-  margin-right: 10px;
+  transition: background 0.2s;
+  margin-right: 0;
+  font-size: 0.97rem;
 }
 
 .menu-link:hover,
 .accordion-header:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: #23232b;
   color: #fff;
-  transform: translateX(5px);
 }
 
 .menu-link.active,
 .accordion-header.active {
-  background: linear-gradient(90deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+  background: #23232b;
   color: #fff;
-  border-right: 3px solid #667eea;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
 }
 
 .icon-container {
-  width: 36px;
-  height: 36px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
+  width: 28px;
+  height: 28px;
+  background: #23232b;
+  border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.3s ease;
-}
-
-.menu-link:hover .icon-container,
-.accordion-header:hover .icon-container,
-.menu-link.active .icon-container,
-.accordion-header.active .icon-container {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  transform: scale(1.1);
 }
 
 .icon {
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
   object-fit: contain;
   filter: brightness(0) invert(1);
   opacity: 0.8;
-  transition: all 0.3s ease;
-}
-
-.menu-link:hover .icon,
-.accordion-header:hover .icon,
-.menu-link.active .icon,
-.accordion-header.active .icon {
-  opacity: 1;
-  filter: brightness(0) invert(1);
 }
 
 .menu-text {
   flex: 1;
-  font-size: 0.95rem;
-  font-weight: 500;
-  font-family: YekanRegular, 'YekanRegular', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 400;
 }
 
 .menu-badge {
@@ -457,85 +406,77 @@ watch(() => route.path, autoOpen, { immediate: true });
   min-width: 20px;
 }
 
-/* Accordion */
 .accordion-arrow {
-  width: 20px;
-  height: 20px;
-  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  color: rgba(255, 255, 255, 0.6);
-  transform: rotate(180deg);
+  width: 16px;
+  height: 16px;
+  transition: transform 0.3s;
+  color: #888;
+  transform: rotate(90deg);
 }
 
 .accordion-arrow.open {
-  transform: rotate(90deg);
-  color: #667eea;
+  transform: rotate(180deg);
+  color: #fff;
 }
 
 .accordion-body {
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.02);
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  background: none;
+  transition: max-height 0.3s, opacity 0.3s;
   max-height: 0;
   opacity: 0;
 }
 
 .accordion-body.open {
-  max-height: 300px;
+  max-height: 200px;
   opacity: 1;
 }
 
 .accordion-content {
-  transform: translateY(-10px);
-  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.accordion-body.open .accordion-content {
-  transform: translateY(0);
+  transform: none;
+  transition: none;
 }
 
 .submenu-link {
   display: flex;
   align-items: center;
-  padding: 12px 55px;
-  font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.7);
+  padding: 8px 36px;
+  font-size: 0.92rem;
+  color: #bdbdc2;
   text-decoration: none;
-  transition: all 0.3s ease;
-  gap: 12px;
+  transition: background 0.2s;
+  gap: 8px;
 }
 
 .submenu-link:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: #23232b;
   color: #fff;
-  transform: translateX(5px);
 }
 
 .submenu-link.active {
-  background: rgba(102, 126, 234, 0.15);
-  color: #667eea;
-  border-right: 2px solid #667eea;
+  background: #23232b;
+  color: #fff;
 }
 
 .submenu-dot {
-  width: 6px;
-  height: 6px;
+  width: 4px;
+  height: 4px;
   background: currentColor;
   border-radius: 50%;
   opacity: 0.6;
 }
 
-/* Profile Section */
 .profile {
   flex-shrink: 0;
-  padding: 20px;
-  background: rgba(255, 255, 255, 0.05);
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 12px 10px;
+  background: none;
+  border-top: 1px solid #23232b;
 }
 
 .profile-info {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 8px;
 }
 
 .avatar-container {
@@ -543,12 +484,11 @@ watch(() => route.path, autoOpen, { immediate: true });
 }
 
 .avatar {
-  width: 55px;
-  height: 55px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   object-fit: cover;
-  border: 3px solid rgba(255, 255, 255, 0.1);
-  transition: all 0.3s ease;
+  border: 2px solid #23232b;
 }
 
 .avatar:hover {
@@ -575,27 +515,25 @@ watch(() => route.path, autoOpen, { immediate: true });
 }
 
 .profile-name {
-  margin: 0 0 4px 0;
-  font-size: 1rem;
-  font-weight: 600;
+  margin: 0 0 2px 0;
+  font-size: 0.95rem;
+  font-weight: 500;
   color: #fff;
-  font-family: YekanRegular, 'YekanRegular', sans-serif;
 }
 
 .profile-role {
   margin: 0;
-  font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.7);
-  font-family: YekanRegular, 'YekanRegular', sans-serif;
+  font-size: 0.8rem;
+  color: #bdbdc2;
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
   .sidebar {
     width: 60%;
     transform: translateX(100%);
+    right: 0;
+    left: auto;
   }
-
   .sidebar.mobile-open {
     transform: translateX(0);
   }
