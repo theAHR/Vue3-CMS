@@ -36,8 +36,7 @@
     <!-- Navigation Menu -->
     <nav class="menu" role="navigation">
       <div class="menu-section">
-        <h3 class="menu-section-title">منوی اصلی</h3>
-        <template v-for="item in mainMenuItems" :key="item.title">
+        <template v-for="item in [...mainMenuItems, ...systemMenuItems]" :key="item.title">
           <router-link
             v-if="!item.children"
             :to="item.to"
@@ -50,57 +49,6 @@
             </div>
             <span class="menu-text">{{ item.title }}</span>
             <div class="menu-badge" v-if="item.badge">{{ item.badge }}</div>
-          </router-link>
-
-          <div v-else class="accordion">
-            <div
-              class="accordion-header"
-              @click="toggle(item.key)"
-              :class="{ active: isParentActive(item.paths) }"
-            >
-              <div class="icon-container">
-                <img :src="item.icon" class="icon" :alt="item.title" />
-              </div>
-              <span class="menu-text">{{ item.title }}</span>
-              <div class="accordion-arrow" :class="{ open: open[item.key] }">
-                <svg viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
-                </svg>
-              </div>
-            </div>
-            <div class="accordion-body" :class="{ open: open[item.key] }">
-              <div class="accordion-content">
-                <router-link
-                  v-for="child in item.children"
-                  :key="child.title"
-                  :to="child.to"
-                  class="submenu-link"
-                  active-class="active"
-                  @click="handleMenuClick"
-                >
-                  <span class="submenu-dot"></span>
-                  {{ child.title }}
-                </router-link>
-              </div>
-            </div>
-          </div>
-        </template>
-      </div>
-
-      <div class="menu-section">
-        <h3 class="menu-section-title">مدیریت سیستم</h3>
-        <template v-for="item in systemMenuItems" :key="item.title">
-          <router-link
-            v-if="!item.children"
-            :to="item.to"
-            class="menu-link"
-            active-class="active"
-            @click="handleMenuClick"
-          >
-            <div class="icon-container">
-              <img :src="item.icon" class="icon" :alt="item.title" />
-            </div>
-            <span class="menu-text">{{ item.title }}</span>
           </router-link>
 
           <div v-else class="accordion">
@@ -594,6 +542,7 @@ watch(() => route.path, autoOpen, { immediate: true });
   height: 20px;
   transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   color: rgba(255, 255, 255, 0.6);
+  transform: rotate(180deg);
 }
 
 .accordion-arrow.open {

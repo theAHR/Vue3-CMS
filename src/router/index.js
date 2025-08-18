@@ -3,6 +3,16 @@ import DefaultLayout from '@/layouts/DefaultLayout.vue'
 
 const routes = [
   {
+    path: '/account/auth',
+    component: () => import('@/pages/account/auth.vue'),
+    name: 'AccountAuth'
+  },
+  {
+    path: '/account/logout',
+    component: () => import('@/pages/account/logout.vue'),
+    name: 'AccountLogout'
+  },
+  {
     path: '/',
     component: DefaultLayout,
     redirect: '/dashboard',
@@ -117,16 +127,7 @@ const routes = [
         component: () => import('@/pages/account/profile.vue'),
         name: 'AccountProfile'
       },
-      {
-        path: '/account/auth',
-        component: () => import('@/pages/account/auth.vue'),
-        name: 'AccountAuth'
-      },
-      {
-        path: '/account/logout',
-        component: () => import('@/pages/account/logout.vue'),
-        name: 'AccountLogout'
-      }
+
     ]
   },
   {
@@ -140,6 +141,29 @@ const router = createRouter({
   linkActiveClass: 'active',
   linkExactActiveClass: 'active-exact',
   routes
+})
+
+router.beforeEach((to, from, next) => {
+  const publicPages = ['/account/auth', '/account/logout']
+  const authRequired = !publicPages.includes(to.path)
+  
+  if (authRequired) {
+    const token = document.cookie.includes('tspadmin.token=')
+    if (!token) {
+      next('/account/auth')
+      return
+    }
+  }
+  
+  if (to.path === '/account/auth') {
+    const token = document.cookie.includes('tspadmin.token=')
+    if (token) {
+      next('/dashboard')
+      return
+    }
+  }
+  
+  next()
 })
 
 export default router

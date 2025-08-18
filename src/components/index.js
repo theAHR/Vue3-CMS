@@ -5,6 +5,8 @@ export { default as Header } from './Header/Header.vue'
 // Common Components (to be created)
 export { default as Button } from './common/Button.vue'
 export { default as Card } from './common/Card.vue'
+export { default as Snackbar } from './common/Snackbar.vue'
+export { default as ConfirmDialog } from './common/ConfirmDialog.vue'
 export { default as Modal } from './common/Modal.vue'
 export { default as Table } from './common/Table.vue'
 export { default as Form } from './common/Form.vue'

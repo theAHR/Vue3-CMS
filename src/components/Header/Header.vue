@@ -1,5 +1,17 @@
 <template>
   <header class="header">
+    <!-- Confirm Dialog for Logout -->
+    <ConfirmDialog
+      v-model="showLogoutConfirm"
+      title="خروج از سیستم"
+      message="آیا مطمئن هستید که می‌خواهید از سیستم خارج شوید؟"
+      confirm-text="بله، خروج"
+      cancel-text="انصراف"
+      type="danger"
+      :loading="isLoggingOut"
+      @confirm="handleLogoutConfirm"
+      @cancel="showLogoutConfirm = false"
+    />
     <div class="header-content">
       <div class="header-right">
         <!-- Notifications -->
@@ -53,11 +65,14 @@
 
         <!-- Logout Button -->
         <div class="logout-section">
-          <button class="logout-button" @click="logout">
-            <svg class="logout-icon" viewBox="0 0 24 24" fill="currentColor">
+          <button class="logout-button" @click="showLogoutConfirm = true" title="خروج از سیستم" :disabled="isLoggingOut">
+            <svg v-if="!isLoggingOut" class="logout-icon" viewBox="0 0 24 24" fill="currentColor">
               <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
             </svg>
-            <span class="logout-text">خروج</span>
+            <svg v-else class="logout-icon loading" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+            </svg>
+            <span class="logout-text">{{ isLoggingOut ? 'در حال خروج...' : 'خروج' }}</span>
           </button>
         </div>
       </div>
@@ -140,6 +155,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import ConfirmDialog from '../common/ConfirmDialog.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -149,6 +165,8 @@ const searchQuery = ref('');
 const showNotifications = ref(false);
 const showMessages = ref(false);
 const showQuickActions = ref(false);
+const isLoggingOut = ref(false);
+const showLogoutConfirm = ref(false);
 
 // Mock data
 const notificationCount = ref(3);
@@ -263,9 +281,38 @@ const navigateTo = (path) => {
   showQuickActions.value = false;
 };
 
-const logout = () => {
-  // Implement logout functionality
-  router.push('/account/logout');
+const handleLogoutConfirm = async () => {
+  isLoggingOut.value = true;
+  try {
+    // Import and use the account store for logout
+    const { useAccountStore } = await import('@/stores/account');
+    const { useSnackbar } = await import('@/utils/snackbar');
+    
+    const accountStore = useAccountStore();
+    const { success, error: showError } = useSnackbar();
+    
+    await accountStore.logout();
+    success('خروج با موفقیت انجام شد');
+    router.push('/account/auth');
+  } catch (error) {
+    console.error('Logout error:', error);
+    
+    // Show error message to user
+    const { useSnackbar } = await import('@/utils/snackbar');
+    const { error: showError } = useSnackbar();
+    
+    if (error.response?.status === 401) {
+      showError('توکن منقضی شده است. لطفاً دوباره وارد شوید.');
+    } else {
+      showError('خطا در خروج از سیستم. لطفاً دوباره تلاش کنید.');
+    }
+    
+    // Even if logout fails, redirect to login
+    router.push('/account/auth');
+  } finally {
+    isLoggingOut.value = false;
+    showLogoutConfirm.value = false;
+  }
 };
 
 // Close dropdowns when clicking outside
@@ -539,10 +586,18 @@ onUnmounted(() => {
   font-size: 0.9rem;
 }
 
-.logout-button:hover {
+.logout-button:hover:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(255, 107, 107, 0.3);
 }
+
+.logout-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+
 
 .logout-icon {
   width: 18px;
