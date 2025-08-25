@@ -1,6 +1,8 @@
 <template>
   <div v-if="appStore.isMobileSidebarOpen" class="mobile-overlay" @click="appStore.closeMobileSidebar"></div>
+  
   <aside class="sidebar" :class="{ 'mobile-open': appStore.isMobileSidebarOpen }">
+    <!-- Sidebar Header -->
     <div class="sidebar-header">
       <div class="logo-container">
         <div class="logo-icon">
@@ -9,9 +11,12 @@
         <h2 class="logo-text">پنل مدیریت محتوا</h2>
       </div>
     </div>
+
+    <!-- Navigation Menu -->
     <nav class="menu" role="navigation">
       <div class="menu-section">
-        <template v-for="item in [...mainMenuItems, ...systemMenuItems]" :key="item.title">
+        <template v-for="item in allMenuItems" :key="item.title">
+          <!-- Single Menu Item -->
           <router-link
             v-if="!item.children"
             :to="item.to"
@@ -24,23 +29,23 @@
             </div>
             <span class="menu-text">{{ item.title }}</span>
           </router-link>
+
+          <!-- Accordion Menu Item -->
           <div v-else class="accordion">
             <div
               class="accordion-header"
-              @click="toggle(item.key)"
+              @click="toggleAccordion(item.key)"
               :class="{ active: isParentActive(item.paths) }"
             >
               <div class="icon-container">
                 <img :src="item.icon" class="icon" :alt="item.title" />
               </div>
               <span class="menu-text">{{ item.title }}</span>
-              <div class="accordion-arrow" :class="{ open: open[item.key] }">
-                <svg viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M9 10l3 3 3-3"/>
-                </svg>
+              <div class="accordion-arrow" :class="{ open: openAccordions[item.key] }">
+                <img :src="arrowIcon" alt="arrow" />
               </div>
             </div>
-            <div class="accordion-body" :class="{ open: open[item.key] }">
+            <div class="accordion-body" :class="{ open: openAccordions[item.key] }">
               <div class="accordion-content">
                 <router-link
                   v-for="child in item.children"
@@ -59,25 +64,29 @@
         </template>
       </div>
     </nav>
+
+    <!-- User Profile Section -->
     <div class="profile">
       <div class="profile-info">
         <div class="avatar-container">
-          <img :src="HajAmir" class="avatar" alt="مدیر سیستم" />
+          <img :src="profileImage" class="avatar" alt="مدیر سیستم" />
         </div>
-        <div class="profile-details">
-          <h3 class="profile-name">حاج امیر</h3>
-          <p class="profile-role">مدیر سیستم</p>
-        </div>
+                  <div class="profile-details">
+            <h3 class="profile-name">{{ PROFILE_DATA.name }}</h3>
+            <p class="profile-role">{{ PROFILE_DATA.role }}</p>
+          </div>
       </div>
     </div>
   </aside>
 </template>
 
 <script setup>
-import { ref, watch, onMounted, onUnmounted } from "vue"
+import { ref, watch, onMounted, onUnmounted, computed } from "vue"
 import { useRoute } from "vue-router"
 import { useAppStore } from "@/stores/app"
-import HajAmir from "@/assets/img/img/HajAmir.jpg"
+
+// Assets
+import profileImage from "@/assets/img/img/HajAmir.jpg"
 import homeIcon from "@/assets/img/icons/home.svg"
 import newsIcon from "@/assets/img/icons/news.svg"
 import announcementIcon from "@/assets/img/icons/announcement.svg"
@@ -92,7 +101,17 @@ import socialIcon from "@/assets/img/icons/social.svg"
 import userIcon from "@/assets/img/icons/user.svg"
 import roleIcon from "@/assets/img/icons/role.svg"
 import commentIcon from "@/assets/img/icons/comment.svg"
+import arrowIcon from "@/assets/img/icons/arrow.svg"
 
+// Constants
+const PROFILE_DATA = {
+  name: "حاج امیر",
+  role: "مدیر سیستم"
+}
+
+const MOBILE_BREAKPOINT = 768
+
+// Icons mapping
 const icons = {
   home: homeIcon,
   news: newsIcon,
@@ -110,12 +129,9 @@ const icons = {
   comment: commentIcon
 }
 
-const route = useRoute()
-const appStore = useAppStore()
-const open = ref({})
-
+// Menu configuration
 const mainMenuItems = [
-  { title: "داشبورد", to: "/dashboard", icon: icons.home, badge: "جدید" },
+  { title: "داشبورد", to: "/dashboard", icon: icons.home },
   {
     title: "خبر",
     key: "news",
@@ -197,44 +213,60 @@ const systemMenuItems = [
   }
 ]
 
-function toggle(key) {
-  open.value[key] = !open.value[key]
+// Composables
+const route = useRoute()
+const appStore = useAppStore()
+
+// Reactive state
+const openAccordions = ref({})
+
+// Computed properties
+const allMenuItems = computed(() => [...mainMenuItems, ...systemMenuItems])
+
+// Methods
+const toggleAccordion = (key) => {
+  openAccordions.value[key] = !openAccordions.value[key]
 }
 
-function isParentActive(paths) {
-  return paths.some((p) => route.path.startsWith(p))
+const isParentActive = (paths) => {
+  return paths.some((path) => route.path.startsWith(path))
 }
 
-function autoOpen() {
-  [...mainMenuItems, ...systemMenuItems].forEach((item) => {
+const autoOpenAccordions = () => {
+  allMenuItems.value.forEach((item) => {
     if (item.children && isParentActive(item.paths)) {
-      open.value[item.key] = true
+      openAccordions.value[item.key] = true
     }
   })
 }
 
-function handleMenuClick() {
-  if (window.innerWidth <= 768) {
+const handleMenuClick = () => {
+  if (window.innerWidth <= MOBILE_BREAKPOINT) {
     appStore.closeMobileSidebar()
   }
 }
 
-function handleResize() {
-  if (window.innerWidth > 768) {
+const handleResize = () => {
+  if (window.innerWidth > MOBILE_BREAKPOINT) {
     appStore.closeMobileSidebar()
   }
 }
 
+// Lifecycle hooks
 onMounted(() => {
   window.addEventListener('resize', handleResize)
 })
+
 onUnmounted(() => {
   window.removeEventListener('resize', handleResize)
 })
-watch(() => route.path, autoOpen, { immediate: true })
+
+// Watchers
+watch(() => route.path, autoOpenAccordions, { immediate: true })
 </script>
 
 <style scoped>
+/* Base Sidebar Styles */
 .sidebar {
   width: 300px;
   height: 100vh;
@@ -251,6 +283,7 @@ watch(() => route.path, autoOpen, { immediate: true })
   transform: translateX(0);
 }
 
+/* Mobile Overlay */
 .mobile-overlay {
   position: fixed;
   top: 0;
@@ -263,11 +296,11 @@ watch(() => route.path, autoOpen, { immediate: true })
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* Sidebar Header */
 .sidebar-header {
   padding: 18px 12px;
   text-align: center;
   border-bottom: 1px solid #23232b;
-  background: none;
 }
 
 .logo-container {
@@ -275,7 +308,6 @@ watch(() => route.path, autoOpen, { immediate: true })
   align-items: center;
   justify-content: center;
   gap: 8px;
-  margin-bottom: 0;
 }
 
 .logo-icon {
@@ -288,7 +320,7 @@ watch(() => route.path, autoOpen, { immediate: true })
   justify-content: center;
 }
 
-.logo-icon .logo-image {
+.logo-image {
   width: 18px;
   height: 18px;
   object-fit: contain;
@@ -301,13 +333,7 @@ watch(() => route.path, autoOpen, { immediate: true })
   color: #fff;
 }
 
-.header-subtitle {
-  margin: 4px 0 0 0;
-  font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.8);
-  font-family: YekanRegular, 'YekanRegular', sans-serif;
-}
-
+/* Navigation Menu */
 .menu {
   flex: 1;
   overflow-y: auto;
@@ -335,17 +361,7 @@ watch(() => route.path, autoOpen, { immediate: true })
   margin-bottom: 0;
 }
 
-.menu-section-title {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.5);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin: 0 20px 12px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
+/* Menu Links */
 .menu-link,
 .accordion-header {
   display: flex;
@@ -357,6 +373,7 @@ watch(() => route.path, autoOpen, { immediate: true })
   transition: background 0.2s;
   margin-right: 0;
   font-size: 0.97rem;
+  cursor: pointer;
 }
 
 .menu-link:hover,
@@ -395,33 +412,36 @@ watch(() => route.path, autoOpen, { immediate: true })
   font-weight: 400;
 }
 
-.menu-badge {
-  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
-  color: white;
-  font-size: 0.7rem;
-  font-weight: 600;
-  padding: 4px 8px;
-  border-radius: 12px;
-  text-align: center;
-  min-width: 20px;
-}
-
+/* Accordion Styles */
 .accordion-arrow {
   width: 16px;
   height: 16px;
   transition: transform 0.3s;
-  color: #888;
-  transform: rotate(90deg);
+  transform: rotate(180deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.accordion-arrow img {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+  opacity: 0.5;
+  transition: all 0.3s ease;
 }
 
 .accordion-arrow.open {
-  transform: rotate(180deg);
-  color: #fff;
+  transform: rotate(90deg);
+}
+
+.accordion-arrow.open img {
+  opacity: 0.8;
 }
 
 .accordion-body {
   overflow: hidden;
-  background: none;
   transition: max-height 0.3s, opacity 0.3s;
   max-height: 0;
   opacity: 0;
@@ -433,10 +453,10 @@ watch(() => route.path, autoOpen, { immediate: true })
 }
 
 .accordion-content {
-  transform: none;
-  transition: none;
+  /* Removed unused transform and transition */
 }
 
+/* Submenu Links */
 .submenu-link {
   display: flex;
   align-items: center;
@@ -466,10 +486,10 @@ watch(() => route.path, autoOpen, { immediate: true })
   opacity: 0.6;
 }
 
+/* Profile Section */
 .profile {
   flex-shrink: 0;
   padding: 12px 10px;
-  background: none;
   border-top: 1px solid #23232b;
 }
 
@@ -489,25 +509,12 @@ watch(() => route.path, autoOpen, { immediate: true })
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid #23232b;
+  transition: border-color 0.2s, transform 0.2s;
 }
 
 .avatar:hover {
   border-color: #667eea;
   transform: scale(1.05);
-}
-
-.status-indicator {
-  position: absolute;
-  bottom: 2px;
-  right: 2px;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  border: 3px solid #1a1a2e;
-}
-
-.status-indicator.online {
-  background: #00d4aa;
 }
 
 .profile-details {
@@ -527,13 +534,13 @@ watch(() => route.path, autoOpen, { immediate: true })
   color: #bdbdc2;
 }
 
+/* Responsive Design */
 @media (max-width: 768px) {
   .sidebar {
     width: 60%;
     transform: translateX(100%);
-    right: 0;
-    left: auto;
   }
+  
   .sidebar.mobile-open {
     transform: translateX(0);
   }
@@ -576,10 +583,6 @@ watch(() => route.path, autoOpen, { immediate: true })
   
   .logo-text {
     font-size: 1rem;
-  }
-
-  .header-subtitle {
-    font-size: 0.8rem;
   }
 }
 

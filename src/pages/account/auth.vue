@@ -1,10 +1,10 @@
 <template>
   <div class="login-container">
+    <div class="bg-blur" :style="backgroundStyle"></div>
     <div class="login-card">
       <div class="login-header">
         <img src="@/assets/img/img/logo.svg" alt="Logo" class="logo" />
-        <h1>ورود به سیستم</h1>
-        <p>لطفاً اطلاعات ورود خود را وارد کنید</p>
+        <h1>ورود به پنل مدیریت</h1>
       </div>
       
       <form @submit.prevent="handleLogin" class="login-form">
@@ -52,14 +52,19 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAccountStore } from '@/stores/account'
 import { useSnackbar } from '@/utils/snackbar'
+import Image from '@/assets/img/img/background.jpg'
 
 const router = useRouter()
 const accountStore = useAccountStore()
 const { success, error } = useSnackbar()
+
+const backgroundStyle = computed(() => ({
+  backgroundImage: `url(${Image})`
+}))
 
 const form = reactive({
   username: '',
@@ -124,131 +129,132 @@ const handleLogin = async () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #f7f8fa;
   padding: 20px;
+  position: relative;
+  overflow: hidden;
 }
-
-.login-card {
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-  padding: 40px;
+.bg-blur {
+  position: absolute;
   width: 100%;
-  max-width: 400px;
+  height: 100%;
+  left: 0;
+  background-size: cover;
+  opacity: 1;
+
+  z-index: 0;
+}
+.login-card {
+  background: #fff;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  box-shadow: none;
+  padding: 32px 24px 24px 24px;
+  width: 100%;
+  max-width: 350px;
   text-align: center;
+  position: relative;
+  z-index: 1;
 }
-
 .login-header {
-  margin-bottom: 32px;
+  margin-bottom: 28px;
 }
-
 .logo {
-  width: 80px;
-  height: 80px;
-  margin-bottom: 16px;
+  width: 60px;
+  height: 60px;
+  margin-bottom: 12px;
 }
-
 .login-header h1 {
-  color: #2d3748;
-  font-size: 24px;
+  color: #222;
+  font-size: 20px;
   font-weight: 600;
-  margin-bottom: 8px;
+  margin-bottom: 0;
+  letter-spacing: 0.2px;
 }
-
-.login-header p {
-  color: #718096;
-  font-size: 14px;
-}
-
 .login-form {
   text-align: right;
 }
-
 .form-group {
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   text-align: right;
 }
-
 .form-group label {
   display: block;
-  color: #4a5568;
-  font-size: 14px;
+  color: #444;
+  font-size: 13px;
   font-weight: 500;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   text-align: right;
 }
-
 .form-group input {
   width: 100%;
-  padding: 12px 16px;
-  border: 2px solid #e2e8f0;
-  border-radius: 8px;
+  padding: 10px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
   font-size: 14px;
-  transition: all 0.3s ease;
+  background: #fafbfc;
+  transition: border 0.2s;
   box-sizing: border-box;
 }
-
 .form-group input:focus {
   outline: none;
   border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  background: #fff;
 }
-
 .form-group input.error {
   border-color: #e53e3e;
+  background: #fff5f5;
 }
-
 .error-message {
   color: #e53e3e;
   font-size: 12px;
-  margin-top: 4px;
+  margin-top: 3px;
   display: block;
   text-align: right;
 }
-
 .login-button {
   width: 100%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: #667eea;
+  color: #fff;
   border: none;
-  padding: 14px 24px;
+  padding: 12px 0;
   border-radius: 8px;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  margin-top: 8px;
+  margin-top: 6px;
 }
-
 .login-button:hover:not(:disabled) {
+  background: #556cd6;
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
 }
-
 .login-button:disabled {
   opacity: 0.7;
   cursor: not-allowed;
   transform: none;
 }
-
 .error-alert {
-  background: #fed7d7;
+  background: #fff5f5;
   color: #c53030;
-  padding: 12px 16px;
-  border-radius: 8px;
-  margin-top: 20px;
-  font-size: 14px;
-  border: 1px solid #feb2b2;
+  padding: 10px 12px;
+  border-radius: 6px;
+  margin-top: 16px;
+  font-size: 13px;
+  border: 1px solid #ffe0e0;
 }
-
 @media (max-width: 480px) {
   .login-card {
-    padding: 24px;
-    margin: 16px;
+    padding: 16px 4px 16px 4px;
+    margin: 8px;
+    border-radius: 8px;
   }
-  
   .login-header h1 {
-    font-size: 20px;
+    font-size: 17px;
+  }
+  .logo {
+    width: 44px;
+    height: 44px;
   }
 }
 </style>
