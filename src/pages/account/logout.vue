@@ -1,4 +1,7 @@
 <template>
+  <!-- Blur Overlay -->
+  <div class="blur-overlay"></div>
+  
   <div class="logout-container">
     <div class="logout-card">
       <div class="logout-icon">
@@ -14,7 +17,16 @@
       
       <div class="logout-actions">
         <button @click="handleLogout" class="logout-button" :disabled="loading">
-          <span v-if="loading">در حال خروج...</span>
+          <svg v-if="loading" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="spinner">
+            <path d="M12 2V6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M12 18V22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M4.93 4.93L7.76 7.76" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M16.24 16.24L19.07 19.07" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M2 12H6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M18 12H22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M4.93 19.07L7.76 16.24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M16.24 7.76L19.07 4.93" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
           <span v-else>بله، خروج</span>
         </button>
         
@@ -65,6 +77,18 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.blur-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(5px);
+  z-index: 1000;
+  pointer-events: none; /* Allow clicks to pass through to underlying content */
+}
+
 .logout-container {
   min-height: 100vh;
   display: flex;
@@ -72,6 +96,8 @@ onMounted(() => {
   justify-content: center;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: 20px;
+  position: relative;
+  z-index: 1001;
 }
 
 .logout-card {
@@ -129,6 +155,19 @@ onMounted(() => {
   opacity: 0.7;
   cursor: not-allowed;
   transform: none;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .cancel-button {

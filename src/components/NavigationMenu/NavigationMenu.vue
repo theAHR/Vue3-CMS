@@ -266,16 +266,15 @@ watch(() => route.path, autoOpenAccordions, { immediate: true })
 </script>
 
 <style scoped>
-/* Base Sidebar Styles */
 .sidebar {
-  width: 300px;
+  width: 250px;
   height: 100vh;
   background: #18181c;
   color: #fff;
   display: flex;
   flex-direction: column;
   position: fixed;
-  z-index: 1000;
+  z-index: 1;
   transition: transform 0.3s ease;
   font-family: YekanRegular, 'YekanRegular', sans-serif;
   right: 0;
@@ -448,24 +447,25 @@ watch(() => route.path, autoOpenAccordions, { immediate: true })
 }
 
 .accordion-body.open {
-  max-height: 200px;
+  max-height: 300px;
   opacity: 1;
 }
 
 .accordion-content {
-  /* Removed unused transform and transition */
+  padding: 6px 0;
 }
 
 /* Submenu Links */
 .submenu-link {
   display: flex;
   align-items: center;
-  padding: 8px 36px;
+  padding: 12px 36px;
   font-size: 0.92rem;
   color: #bdbdc2;
   text-decoration: none;
   transition: background 0.2s;
   gap: 8px;
+  margin: 2px 0;
 }
 
 .submenu-link:hover {
@@ -539,6 +539,7 @@ watch(() => route.path, autoOpenAccordions, { immediate: true })
   .sidebar {
     width: 60%;
     transform: translateX(100%);
+    z-index: 1000;
   }
   
   .sidebar.mobile-open {
@@ -559,8 +560,9 @@ watch(() => route.path, autoOpenAccordions, { immediate: true })
   }
 
   .submenu-link {
-    padding: 10px 45px;
+    padding: 14px 45px;
     font-size: 0.85rem;
+    margin: 3px 0;
   }
 
   .profile {
@@ -579,6 +581,7 @@ watch(() => route.path, autoOpenAccordions, { immediate: true })
 @media (max-width: 480px) {
   .sidebar {
     width: 70%;
+    z-index: 1000
   }
   
   .logo-text {
@@ -589,6 +592,7 @@ watch(() => route.path, autoOpenAccordions, { immediate: true })
 @media (max-width: 360px) {
   .sidebar {
     width: 60%;
+    z-index: 1000;
   }
 
   .sidebar-header {
@@ -601,7 +605,8 @@ watch(() => route.path, autoOpenAccordions, { immediate: true })
   }
 
   .submenu-link {
-    padding: 8px 40px;
+    padding: 12px 40px;
+    margin: 2px 0;
   }
 }
 </style>

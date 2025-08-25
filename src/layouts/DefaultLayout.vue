@@ -32,9 +32,8 @@ const showIntro = computed(() => {
 
 .main-content {
   flex: 1;
-  margin-right: 300px;
+  margin-right: 250px;
   margin-top: 70px;
-  height: calc(100vh - 70px);
   transition: margin-right 0.3s ease;
   overflow-y: auto;
   position: relative;

@@ -4,7 +4,7 @@
     <div class="login-card">
       <div class="login-header">
         <img src="@/assets/img/img/logo.svg" alt="Logo" class="logo" />
-        <h1>ورود به پنل مدیریت</h1>
+        <h1>پنل مدیریت محتوا</h1>
       </div>
       
       <form @submit.prevent="handleLogin" class="login-form">
@@ -23,14 +23,35 @@
         
         <div class="form-group">
           <label for="password">رمز عبور</label>
-          <input
-            id="password"
-            v-model="form.password"
-            type="password"
-            :class="{ 'error': errors.password }"
-            placeholder="رمز عبور خود را وارد کنید"
-            required
-          />
+          <div class="password-input-container">
+            <input
+              id="password"
+              v-model="form.password"
+              :type="showPassword ? 'text' : 'password'"
+              :class="{ 'error': errors.password }"
+              placeholder="رمز عبور خود را وارد کنید"
+              required
+            />
+            <button
+              type="button"
+              class="password-toggle"
+              @click="togglePassword"
+              :aria-label="showPassword ? 'مخفی کردن رمز عبور' : 'نمایش رمز عبور'"
+            >
+              <img
+                v-if="showPassword"
+                src="@/assets/img/icons/eye-close.svg"
+                alt="مخفی کردن"
+                class="eye-icon"
+              />
+              <img
+                v-else
+                src="@/assets/img/icons/eye-open.svg"
+                alt="نمایش"
+                class="eye-icon"
+              />
+            </button>
+          </div>
           <span v-if="errors.password" class="error-message">{{ errors.password }}</span>
         </div>
         
@@ -39,8 +60,17 @@
           class="login-button"
           :disabled="loading"
         >
-          <span v-if="loading">در حال ورود...</span>
-          <span v-else>ورود</span>
+          <svg v-if="loading" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="spinner">
+            <path d="M12 2V6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M12 18V22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M4.93 4.93L7.76 7.76" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M16.24 16.24L19.07 19.07" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M2 12H6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M18 12H22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M4.93 19.07L7.76 16.24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M16.24 7.76L19.07 4.93" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span v-else>ورود به سیستم</span>
         </button>
       </form>
       
@@ -78,6 +108,11 @@ const errors = reactive({
 
 const loading = ref(false)
 const errorMessage = ref('')
+const showPassword = ref(false)
+
+const togglePassword = () => {
+  showPassword.value = !showPassword.value
+}
 
 const validateForm = () => {
   let isValid = true
@@ -160,13 +195,13 @@ const handleLogin = async () => {
   margin-bottom: 28px;
 }
 .logo {
-  width: 60px;
-  height: 60px;
+  width: 80px;
+  height: 80px;
   margin-bottom: 12px;
 }
 .login-header h1 {
-  color: #222;
-  font-size: 20px;
+  color: #444444;
+  font-size: 18px;
   font-weight: 600;
   margin-bottom: 0;
   letter-spacing: 0.2px;
@@ -214,7 +249,7 @@ const handleLogin = async () => {
 }
 .login-button {
   width: 100%;
-  background: #667eea;
+  background: var(--primary-gradient);
   color: #fff;
   border: none;
   padding: 12px 0;
@@ -226,11 +261,9 @@ const handleLogin = async () => {
   margin-top: 6px;
 }
 .login-button:hover:not(:disabled) {
-  background: #556cd6;
-  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(160, 160, 160, 0.85);
 }
 .login-button:disabled {
-  opacity: 0.7;
   cursor: not-allowed;
   transform: none;
 }
@@ -242,6 +275,47 @@ const handleLogin = async () => {
   margin-top: 16px;
   font-size: 13px;
   border: 1px solid #ffe0e0;
+}
+
+.password-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-toggle {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 20px;
+}
+
+.eye-icon {
+  width: 20px;
+  height: 20px;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.eye-icon:hover {
+  opacity: 1;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 @media (max-width: 480px) {
   .login-card {
