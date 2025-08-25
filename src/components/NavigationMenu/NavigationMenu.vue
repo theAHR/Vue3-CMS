@@ -269,7 +269,7 @@ watch(() => route.path, autoOpenAccordions, { immediate: true })
 .sidebar {
   width: 250px;
   height: 100vh;
-  background: #18181c;
+  background: rgb(43, 43, 43);
   color: #fff;
   display: flex;
   flex-direction: column;
@@ -377,13 +377,13 @@ watch(() => route.path, autoOpenAccordions, { immediate: true })
 
 .menu-link:hover,
 .accordion-header:hover {
-  background: #23232b;
+  background: rgb(43, 43, 43);
   color: #fff;
 }
 
 .menu-link.active,
 .accordion-header.active {
-  background: #23232b;
+  background: #494949;
   color: #fff;
 }
 
@@ -469,12 +469,12 @@ watch(() => route.path, autoOpenAccordions, { immediate: true })
 }
 
 .submenu-link:hover {
-  background: #23232b;
+  background: #464646;
   color: #fff;
 }
 
 .submenu-link.active {
-  background: #23232b;
+  background: #333333;
   color: #fff;
 }
 
@@ -490,7 +490,7 @@ watch(() => route.path, autoOpenAccordions, { immediate: true })
 .profile {
   flex-shrink: 0;
   padding: 12px 10px;
-  border-top: 1px solid #23232b;
+  border-top: 1px solid #555555;
 }
 
 .profile-info {
@@ -513,7 +513,7 @@ watch(() => route.path, autoOpenAccordions, { immediate: true })
 }
 
 .avatar:hover {
-  border-color: #667eea;
+  border-color: #585858;
   transform: scale(1.05);
 }
 
