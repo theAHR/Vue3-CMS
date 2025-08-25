@@ -1,13 +1,14 @@
 <template>
   <div>
-    <h1>Contact Request Management</h1>
+    <Title title="لیست دستورالعمل‌ها" />
   </div>
 </template>
 
 <script setup>
+import Title from '@/components/common/Title.vue';
 // Contact Request management component
 </script>
 
 <style scoped>
-/* Contact Request management styles */
+/* Instruction management styles */
 </style> 

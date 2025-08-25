@@ -41,7 +41,7 @@ const props = defineProps({
   animation: spin 1s linear infinite;
 }
 .path {
-  stroke: #667eea;
+  stroke: #6A649E;
   stroke-linecap: round;
   opacity: 0.85;
   stroke-dasharray: 90, 150;
@@ -67,7 +67,7 @@ const props = defineProps({
   100% { transform: rotate(360deg); }
 }
 .loading-text {
-  color: #667eea;
+  color: #6A649E ;
   font-size: 1.1rem;
   font-weight: 500;
   font-family: YekanRegular, 'YekanRegular', sans-serif;

@@ -1,13 +1,14 @@
 <template>
   <div>
-    <h1>Rate and Review Management</h1>
+    <Title title="نظرات و امتیازات" />
   </div>
 </template>
 
 <script setup>
+import Title from '@/components/common/Title.vue';
 // Rate and Review management component
 </script>
 
 <style scoped>
-/* Rate and Review management styles */
+/* Rate and review management styles */
 </style> 

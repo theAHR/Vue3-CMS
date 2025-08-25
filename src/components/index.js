@@ -11,6 +11,7 @@ export { default as Modal } from './common/Modal.vue'
 export { default as Table } from './common/Table.vue'
 export { default as Form } from './common/Form.vue'
 export { default as Loading } from './common/Loading.vue'
+export { default as Title } from './common/Title.vue'
 export { default as EmptyState } from './common/EmptyState.vue'
 
 // Dashboard Components (to be created)

@@ -184,7 +184,6 @@ const cardStyles = computed(() => {
   border-color: #17a2b8;
 }
 
-/* Card Sizes */
 .card-small {
   padding: 16px;
 }
@@ -197,7 +196,6 @@ const cardStyles = computed(() => {
   padding: 32px;
 }
 
-/* Card Header */
 .card-header {
   margin: -24px -24px 20px -24px;
   padding: 20px 24px;
@@ -241,7 +239,7 @@ const cardStyles = computed(() => {
 
 .title-text {
   margin: 0;
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 600;
   color: #2d3748;
   font-family: YekanRegular, 'YekanRegular', sans-serif;
@@ -262,13 +260,11 @@ const cardStyles = computed(() => {
   margin-top: 12px;
 }
 
-/* Card Body */
 .card-body {
   position: relative;
   z-index: 1;
 }
 
-/* Card Footer */
 .card-footer {
   margin: 20px -24px -24px -24px;
   padding: 20px 24px;

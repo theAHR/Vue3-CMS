@@ -69,6 +69,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useAccountStore } from '@/stores/account'
 import Loading from '@/components/common/Loading.vue'
+import Title from '@/components/common/Title.vue';
 
 const accountStore = useAccountStore()
 const profileData = ref({})

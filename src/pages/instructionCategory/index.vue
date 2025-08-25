@@ -1,13 +1,14 @@
 <template>
   <div>
-    <h1>Announcement Category Management</h1>
+    <Title title="دسته‌بندی دستورالعمل‌ها" />
   </div>
 </template>
 
 <script setup>
+import Title from '@/components/common/Title.vue';
 // Announcement Category management component
 </script>
 
 <style scoped>
-/* Announcement Category management styles */
+/* Instruction category management styles */
 </style> 

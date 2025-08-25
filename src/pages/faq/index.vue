@@ -1,10 +1,11 @@
 <template>
   <div>
-    <h1>FAQ Management</h1>
+    <Title title="لیست سوالات متداول" />
   </div>
 </template>
 
 <script setup>
+import Title from '@/components/common/Title.vue';
 // FAQ management component
 </script>
 

@@ -27,21 +27,30 @@ const showIntro = computed(() => {
 .layout-container {
   display: flex;
   min-height: 100vh;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  background-color: rgba(236, 236, 236, 0.39);
 }
 
 .main-content {
   flex: 1;
   margin-right: 300px;
   margin-top: 70px;
-  min-height: calc(100vh - 70px);
+  height: calc(100vh - 70px);
   transition: margin-right 0.3s ease;
+  overflow-y: auto;
+  position: relative;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.main-content::-webkit-scrollbar {
+  display: none;
 }
 
 .content-wrapper {
   padding: 30px;
-  max-width: 1400px;
-  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 100%;
 }
 
 /* Responsive Design */
@@ -53,7 +62,7 @@ const showIntro = computed(() => {
   .main-content {
     margin-right: 0;
     margin-top: 60px;
-    min-height: calc(100vh - 60px);
+    height: calc(100vh - 60px);
   }
   
   .content-wrapper {

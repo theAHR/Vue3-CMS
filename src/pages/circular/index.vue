@@ -1,10 +1,11 @@
 <template>
   <div>
-    <h1>Circular Management</h1>
+    <Title title="لیست بخشنامه‌ها" />
   </div>
 </template>
 
 <script setup>
+import Title from '@/components/common/Title.vue';
 // Circular management component
 </script>
 

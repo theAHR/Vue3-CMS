@@ -23,6 +23,15 @@
   src: url('./assets/fonts/woff/IRANYekanX-Black.woff') format('woff');
 }
 
+:root {
+  --primary-gradient: linear-gradient(180deg, #857BD0 0%, #6A649E 100%);
+  --secondary-gradient: linear-gradient(180deg, #6AAD6F 0%, #4B794E 100%);
+  --primary-start: #6E63C4;
+  --primary-end: #352F5E;
+  --secondary-start: #6AAD6F;
+  --secondary-end: #4B794E;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -40,7 +49,6 @@ html {
 
 body {
   height: 100%;
-  overflow-x: hidden;
   font-family: YekanRegular, 'YekanRegular', sans-serif;
 }
 
@@ -54,7 +62,6 @@ button {
 
 #app {
   height: 100vh;
-  overflow: hidden;
   font-family: YekanRegular, 'YekanRegular', sans-serif;
 }
 

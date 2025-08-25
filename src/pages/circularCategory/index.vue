@@ -1,13 +1,14 @@
 <template>
   <div>
-    <h1>Circular Category Management</h1>
+    <Title title="دسته‌بندی بخشنامه‌ها" />
   </div>
 </template>
 
 <script setup>
+import Title from '@/components/common/Title.vue';
 // Circular Category management component
 </script>
 
 <style scoped>
-/* Circular Category management styles */
+/* Circular category management styles */
 </style> 

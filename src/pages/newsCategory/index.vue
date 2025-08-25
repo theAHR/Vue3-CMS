@@ -1,13 +1,14 @@
 <template>
   <div>
-    <h1>News Category Management</h1>
+    <Title title="دسته‌بندی اخبار" />
   </div>
 </template>
 
 <script setup>
+import Title from '@/components/common/Title.vue';
 // News Category management component
 </script>
 
 <style scoped>
-/* News Category management styles */
+/* News category management styles */
 </style> 

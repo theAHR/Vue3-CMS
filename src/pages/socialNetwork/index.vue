@@ -1,13 +1,14 @@
 <template>
   <div>
-    <h1>Social Network Management</h1>
+    <Title title="شبکه‌های اجتماعی" />
   </div>
 </template>
 
 <script setup>
+import Title from '@/components/common/Title.vue';
 // Social Network management component
 </script>
 
 <style scoped>
-/* Social Network management styles */
+/* Social network management styles */
 </style> 

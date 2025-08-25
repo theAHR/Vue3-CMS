@@ -1,10 +1,11 @@
 <template>
   <div>
-    <h1>User Management</h1>
+    <Title title="لیست کاربران" />
   </div>
 </template>
 
 <script setup>
+import Title from '@/components/common/Title.vue';
 // User management component
 </script>
 

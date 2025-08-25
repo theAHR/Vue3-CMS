@@ -1,13 +1,14 @@
 <template>
   <div>
-    <h1>FAQ Category Management</h1>
+    <Title title="دسته‌بندی سوالات" />
   </div>
 </template>
 
 <script setup>
+import Title from '@/components/common/Title.vue';
 // FAQ Category management component
 </script>
 
 <style scoped>
-/* FAQ Category management styles */
+/* FAQ category management styles */
 </style> 

@@ -1,10 +1,11 @@
 <template>
   <div>
-    <h1>Job Management</h1>
+    <Title title="بخش سازمانی" />
   </div>
 </template>
 
 <script setup>
+import Title from '@/components/common/Title.vue';
 // Job management component
 </script>
 

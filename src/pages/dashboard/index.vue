@@ -1,139 +1,6 @@
 <template>
+  <Title title="داشبورد" />
   <div class="dashboard">
-    <!-- Page Header -->
-    <div class="page-header">
-      <div class="header-content">
-        <div class="header-left">
-          <h1 class="page-title">داشبورد</h1>
-          <p class="page-description">نمای کلی از وضعیت سیستم و آمار</p>
-        </div>
-        <div class="header-actions">
-          <Button 
-            variant="primary" 
-            icon="M12 4v16m8-8H4"
-            text="گزارش جدید"
-            @click="createReport"
-          />
-          <Button 
-            variant="outline" 
-            icon="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.121A1 1 0 013 6.414V4z"
-            text="فیلتر"
-            @click="showFilters = !showFilters"
-          />
-        </div>
-      </div>
-    </div>
-
-    <!-- Stats Cards -->
-    <div class="stats-grid">
-      <Card 
-        v-for="stat in stats" 
-        :key="stat.id"
-        :title="stat.title"
-        :icon="stat.icon"
-        :badge="stat.badge"
-        variant="default"
-        hover
-        class="stat-card"
-      >
-        <div class="stat-content">
-          <div class="stat-value">{{ stat.value }}</div>
-          <div class="stat-change" :class="stat.changeType">
-            <svg v-if="stat.changeType === 'positive'" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M7 14l5-5 5 5z"/>
-            </svg>
-            <svg v-else-if="stat.changeType === 'negative'" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M7 10l5 5 5-5z"/>
-            </svg>
-            <span>{{ stat.change }}%</span>
-          </div>
-        </div>
-        <div class="stat-footer">
-          <span class="stat-period">نسبت به ماه گذشته</span>
-        </div>
-      </Card>
-    </div>
-
-    <!-- Charts and Analytics -->
-    <div class="charts-grid">
-      <Card 
-        title="فعالیت‌های اخیر"
-        icon="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-        variant="primary"
-        class="chart-card"
-      >
-        <div class="chart-container">
-          <div class="chart-placeholder">
-            <svg class="chart-icon" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-            </svg>
-            <p>نمودار فعالیت‌ها</p>
-            <small>در حال توسعه...</small>
-          </div>
-        </div>
-      </Card>
-
-      <Card 
-        title="توزیع محتوا"
-        icon="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"
-        variant="success"
-        class="chart-card"
-      >
-        <div class="chart-container">
-          <div class="chart-placeholder">
-            <svg class="chart-icon" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-            </svg>
-            <p>نمودار دایره‌ای</p>
-            <small>در حال توسعه...</small>
-          </div>
-        </div>
-      </Card>
-    </div>
-
-    <!-- Recent Activities -->
-    <div class="activities-section">
-      <Card 
-        title="فعالیت‌های اخیر"
-        icon="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-        variant="info"
-        class="activities-card"
-      >
-        <div class="activities-list">
-          <div 
-            v-for="activity in recentActivities" 
-            :key="activity.id"
-            class="activity-item"
-          >
-            <div class="activity-icon" :class="activity.type">
-              <svg viewBox="0 0 24 24" fill="currentColor">
-                <path :d="activity.icon" />
-              </svg>
-            </div>
-            <div class="activity-content">
-              <div class="activity-title">{{ activity.title }}</div>
-              <div class="activity-description">{{ activity.description }}</div>
-              <div class="activity-meta">
-                <span class="activity-user">{{ activity.user }}</span>
-                <span class="activity-time">{{ formatRelativeTime(activity.time) }}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <template #footer>
-          <div class="activities-footer">
-            <Button 
-              variant="outline" 
-              text="مشاهده همه"
-              @click="viewAllActivities"
-            />
-          </div>
-        </template>
-      </Card>
-    </div>
-
-    <!-- Quick Actions -->
     <div class="quick-actions-section">
       <Card 
         title="عملیات سریع"
@@ -161,120 +28,113 @@
         </div>
       </Card>
     </div>
+
+    <div class="stats-grid">
+      <Card 
+        v-for="stat in stats" 
+        :key="stat.id"
+        :title="stat.title"
+        :icon="stat.icon"
+        variant="default"
+        hover
+        class="stat-card"
+      >
+        <div class="stat-content">
+          <div class="stat-value">{{ stat.value }}</div>
+        </div>
+      </Card>
+    </div>
+
+    <div class="charts-grid">
+      <Card 
+        title="آمار کلی"
+        icon="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+        variant="primary"
+        class="chart-card"
+      >
+        <div class="chart-container">
+          <div class="chart-placeholder">
+            <svg class="chart-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+            </svg>
+          </div>
+        </div>
+      </Card>
+
+      <Card 
+        title="توزیع محتوا"
+        icon="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"
+        variant="success"
+        class="chart-card"
+      >
+        <div class="chart-container">
+          <div class="chart-placeholder">
+            <svg class="chart-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+            </svg>
+          </div>
+        </div>
+      </Card>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import Button from '@/components/common/Button.vue';
 import Card from '@/components/common/Card.vue';
-import { formatRelativeTime } from '@/utils/helpers';
+import Title from '@/components/common/Title.vue'
 
 const router = useRouter();
 
-// Reactive data
-const showFilters = ref(false);
-
-// Stats data
 const stats = ref([
   {
     id: 1,
     title: 'کل اخبار',
-    value: '1,234',
-    change: '+12.5',
-    changeType: 'positive',
-    icon: 'M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-5 14H4v-4h11v4zm0-5H4V9h11v4zm5 5h-4V9h4v9z',
-    badge: 'جدید'
+    value: '0',
+    icon: 'M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-5 14H4v-4h11v4zm0-5H4V9h11v4zm5 5h-4V9h4v9z'
   },
   {
     id: 2,
     title: 'کاربران فعال',
-    value: '856',
-    change: '+8.2',
-    changeType: 'positive',
+    value: '0',
     icon: 'M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'
   },
   {
     id: 3,
     title: 'محتویات منتشر شده',
-    value: '2,156',
-    change: '+15.3',
-    changeType: 'positive',
+    value: '0',
     icon: 'M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z'
   },
   {
     id: 4,
     title: 'درخواست‌های جدید',
-    value: '23',
-    change: '-5.2',
-    changeType: 'negative',
+    value: '0',
     icon: 'M20 4H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z'
   }
 ]);
 
-// Recent activities data
-const recentActivities = ref([
-  {
-    id: 1,
-    type: 'news',
-    title: 'خبر جدید منتشر شد',
-    description: 'خبر "افتتاح پروژه جدید" توسط مدیر سیستم منتشر شد',
-    user: 'مدیر سیستم',
-    time: new Date(Date.now() - 5 * 60 * 1000), // 5 minutes ago
-    icon: 'M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-5 14H4v-4h11v4zm0-5H4V9h11v4zm5 5h-4V9h4v9z'
-  },
-  {
-    id: 2,
-    type: 'user',
-    title: 'کاربر جدید ثبت شد',
-    description: 'کاربر "احمد محمدی" با نقش نویسنده ثبت شد',
-    user: 'مدیر کاربران',
-    time: new Date(Date.now() - 15 * 60 * 1000), // 15 minutes ago
-    icon: 'M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'
-  },
-  {
-    id: 3,
-    type: 'content',
-    title: 'محتوا ویرایش شد',
-    description: 'محتوا "راهنمای استفاده" توسط ویرایشگر بروزرسانی شد',
-    user: 'ویرایشگر',
-    time: new Date(Date.now() - 30 * 60 * 1000), // 30 minutes ago
-    icon: 'M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z'
-  },
-  {
-    id: 4,
-    type: 'system',
-    title: 'پشتیبان‌گیری انجام شد',
-    description: 'پشتیبان‌گیری خودکار از پایگاه داده با موفقیت انجام شد',
-    user: 'سیستم',
-    time: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
-    icon: 'M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z'
-  }
-]);
-
-// Quick actions data
 const quickActions = ref([
   {
     id: 1,
     title: 'افزودن خبر',
     description: 'ایجاد خبر جدید',
     icon: 'M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z',
-    handler: () => router.push('/news/create')
+    handler: () => router.push('/news')
   },
   {
     id: 2,
     title: 'مدیریت کاربران',
     description: 'مشاهده و ویرایش کاربران',
     icon: 'M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z',
-    handler: () => router.push('/users')
+    handler: () => router.push('/user')
   },
   {
     id: 3,
-    title: 'گزارش‌ها',
-    description: 'مشاهده گزارش‌های سیستم',
+    title: 'مدیریت نقش‌ها',
+    description: 'تنظیم نقش‌ها و دسترسی‌ها',
     icon: 'M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8V4h6v4h4v10z',
-    handler: () => router.push('/reports')
+    handler: () => router.push('/role')
   },
   {
     id: 4,
@@ -285,28 +145,18 @@ const quickActions = ref([
   }
 ]);
 
-// Methods
 const createReport = () => {
   console.log('Creating new report...');
-  // Implement report creation logic
 };
-
-const viewAllActivities = () => {
-  router.push('/activities');
-};
-
-// Lifecycle
-onMounted(() => {
-  console.log('Dashboard mounted');
-});
 </script>
 
 <style scoped>
 .dashboard {
   max-width: 100%;
+  height: 100%;
+  overflow-y: visible;
 }
 
-/* Page Header */
 .page-header {
   margin-bottom: 30px;
 }
@@ -318,38 +168,15 @@ onMounted(() => {
   gap: 20px;
 }
 
-.header-left {
-  flex: 1;
-}
-
 .page-title {
-  margin: 0 0 8px 0;
-  font-size: 2rem;
-  font-weight: 700;
-  color: #2c3e50;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  font-size: 1.8rem;
+  color: #3f3f3f
 }
 
-.page-description {
-  margin: 0;
-  font-size: 1.1rem;
-  color: #6c757d;
-  font-weight: 400;
-}
-
-.header-actions {
-  display: flex;
-  gap: 12px;
-}
-
-/* Stats Grid */
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
   margin-bottom: 30px;
 }
 
@@ -357,68 +184,44 @@ onMounted(() => {
   transition: all 0.3s ease;
 }
 
+.stat-card :deep(.card-icon) {
+  background: var(--primary-gradient);
+  color: white;
+}
+
 .stat-content {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin-bottom: 16px;
+  justify-content: center;
+  padding: 20px 0;
 }
 
 .stat-value {
-  font-size: 2.5rem;
+  font-size: 1.5rem;
   font-weight: 700;
-  color: #2c3e50;
+  color: #575757;
   line-height: 1;
 }
 
-.stat-change {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  padding: 4px 8px;
-  border-radius: 6px;
-}
-
-.stat-change.positive {
-  color: #28a745;
-  background: rgba(40, 167, 69, 0.1);
-}
-
-.stat-change.negative {
-  color: #dc3545;
-  background: rgba(220, 53, 69, 0.1);
-}
-
-.stat-change svg {
-  width: 16px;
-  height: 16px;
-}
-
-.stat-footer {
-  text-align: left;
-}
-
-.stat-period {
-  font-size: 0.85rem;
-  color: #6c757d;
-}
-
-/* Charts Grid */
 .charts-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 20px;
   margin-bottom: 30px;
 }
 
 .chart-card {
-  min-height: 300px;
+  min-height: 250px;
+  border: none;
+}
+
+.chart-card :deep(.card-icon) {
+  background: var(--primary-gradient);
+  color: white;
 }
 
 .chart-container {
-  height: 250px;
+  height: 200px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -430,134 +233,40 @@ onMounted(() => {
 }
 
 .chart-icon {
-  width: 64px;
-  height: 64px;
-  margin-bottom: 16px;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 12px;
   opacity: 0.5;
 }
 
 .chart-placeholder p {
-  margin: 0 0 8px 0;
-  font-size: 1.1rem;
+  margin: 0 0 6px 0;
+  font-size: 1rem;
   font-weight: 500;
 }
 
 .chart-placeholder small {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   opacity: 0.7;
 }
 
-/* Activities Section */
-.activities-section {
-  margin-bottom: 30px;
-}
-
-.activities-card {
-  min-height: 400px;
-}
-
-.activities-list {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.activity-item {
-  display: flex;
-  gap: 16px;
-  padding: 16px;
-  border-radius: 8px;
-  background: #f8f9fa;
-  transition: background 0.2s ease;
-}
-
-.activity-item:hover {
-  background: #e9ecef;
-}
-
-.activity-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  flex-shrink: 0;
-}
-
-.activity-icon.news {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
-
-.activity-icon.user {
-  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-}
-
-.activity-icon.content {
-  background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
-}
-
-.activity-icon.system {
-  background: linear-gradient(135deg, #17a2b8 0%, #6f42c1 100%);
-}
-
-.activity-icon svg {
-  width: 20px;
-  height: 20px;
-}
-
-.activity-content {
-  flex: 1;
-}
-
-.activity-title {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #495057;
-  margin-bottom: 4px;
-}
-
-.activity-description {
-  font-size: 0.9rem;
-  color: #6c757d;
-  margin-bottom: 8px;
-  line-height: 1.4;
-}
-
-.activity-meta {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  font-size: 0.8rem;
-}
-
-.activity-user {
-  color: #667eea;
-  font-weight: 500;
-}
-
-.activity-time {
-  color: #adb5bd;
-}
-
-.activities-footer {
-  display: flex;
-  justify-content: center;
-}
-
-/* Quick Actions Section */
 .quick-actions-section {
   margin-bottom: 30px;
 }
 
 .quick-actions-card {
-  min-height: 300px;
+  min-height: 250px;
+  border: none;
+}
+
+.quick-actions-card :deep(.card-icon) {
+  background: var(--primary-gradient);
+  color: white;
 }
 
 .quick-actions-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 16px;
 }
 
@@ -581,7 +290,7 @@ onMounted(() => {
 .action-icon {
   width: 48px;
   height: 48px;
-  background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+  background: var(--secondary-gradient);
   border-radius: 12px;
   display: flex;
   align-items: center;
@@ -612,7 +321,6 @@ onMounted(() => {
   line-height: 1.4;
 }
 
-/* Responsive Design */
 @media (max-width: 1200px) {
   .charts-grid {
     grid-template-columns: 1fr;
@@ -632,7 +340,7 @@ onMounted(() => {
   }
   
   .stats-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
     gap: 16px;
   }
   
@@ -641,7 +349,7 @@ onMounted(() => {
   }
   
   .quick-actions-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
   }
   
   .page-title {
@@ -654,15 +362,12 @@ onMounted(() => {
 }
 
 @media (max-width: 480px) {
-  .dashboard {
-    padding: 0;
-  }
-  
   .page-header {
     margin-bottom: 20px;
   }
   
   .stats-grid {
+    grid-template-columns: 1fr;
     gap: 12px;
   }
   
@@ -670,8 +375,8 @@ onMounted(() => {
     gap: 16px;
   }
   
-  .activity-item {
-    padding: 12px;
+  .quick-actions-grid {
+    grid-template-columns: 1fr;
   }
   
   .quick-action-item {

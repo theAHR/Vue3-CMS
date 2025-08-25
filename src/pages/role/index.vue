@@ -1,10 +1,11 @@
 <template>
   <div>
-    <h1>Role Management</h1>
+    <Title title="لیست نقش‌ها" />
   </div>
 </template>
 
 <script setup>
+import Title from '@/components/common/Title.vue';
 // Role management component
 </script>
 

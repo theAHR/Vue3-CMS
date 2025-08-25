@@ -1,10 +1,11 @@
 <template>
   <div>
-    <h1>News Management</h1>
+    <Title title="لیست اخبار" />
   </div>
 </template>
 
 <script setup>
+import Title from '@/components/common/Title.vue';
 // News management component
 </script>
 

@@ -1,10 +1,11 @@
 <template>
   <div>
-    <h1>Multimedia Management</h1>
+    <Title title="ویدئوهای آموزشی" />
   </div>
 </template>
 
 <script setup>
+import Title from '@/components/common/Title.vue';
 // Multimedia management component
 </script>
 

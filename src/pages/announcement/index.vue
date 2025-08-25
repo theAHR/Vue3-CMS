@@ -1,10 +1,11 @@
 <template>
   <div>
-    <h1>Announcement Management</h1>
+    <Title title="لیست اطلاعیه‌ها" />
   </div>
 </template>
 
 <script setup>
+import Title from '@/components/common/Title.vue';
 // Announcement management component
 </script>
 

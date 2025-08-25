@@ -1,13 +1,14 @@
 <template>
   <div>
-    <h1>Job Request Management</h1>
+    <Title title="درخواست‌های شغلی" />
   </div>
 </template>
 
 <script setup>
+import Title from '@/components/common/Title.vue';
 // Job Request management component
 </script>
 
 <style scoped>
-/* Job Request management styles */
+/* Job request management styles */
 </style> 
