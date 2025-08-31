@@ -144,13 +144,15 @@ const handleLogin = async () => {
       password: form.password
     })
     
-    await accountStore.readUserInfo()
-    
     success('ورود با موفقیت انجام شد')
     router.push('/dashboard')
-  } catch (error) {
-    console.error('Login error:', error)
-    errorMessage.value = error.response?.data?.message || 'خطا در ورود. لطفاً دوباره تلاش کنید'
+  } catch (err) {
+    console.error('Login error:', err)
+    console.error('Error response:', err.response)
+    console.error('Error response data:', err.response?.data)
+    console.error('Error response status:', err.response?.status)
+    console.error('Error response headers:', err.response?.headers)
+    errorMessage.value = err.response?.data?.message || 'خطا در ورود. لطفاً دوباره تلاش کنید'
     error(errorMessage.value)
   } finally {
     loading.value = false

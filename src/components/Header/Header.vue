@@ -191,33 +191,18 @@ const navigateTo = (path) => {
 const handleLogoutConfirm = async () => {
   isLoggingOut.value = true;
   
-  try {
-    const { useAccountStore } = await import('@/stores/account');
-    const { useSnackbar } = await import('@/utils/snackbar');
-    
-    const accountStore = useAccountStore();
-    const { success } = useSnackbar();
-    
-    await accountStore.logout();
-    success('خروج با موفقیت انجام شد');
-    router.push('/account/auth');
-  } catch (error) {
-    console.error('Logout error:', error);
-    
-    const { useSnackbar } = await import('@/utils/snackbar');
-    const { error: showError } = useSnackbar();
-    
-    if (error.response?.status === 401) {
-      showError('توکن منقضی شده است. لطفاً دوباره وارد شوید.');
-    } else {
-      showError('خطا در خروج از سیستم. لطفاً دوباره تلاش کنید.');
-    }
-    
-    router.push('/account/auth');
-  } finally {
-    isLoggingOut.value = false;
-    showLogoutConfirm.value = false;
-  }
+  const { useAccountStore } = await import('@/stores/account');
+  const { useSnackbar } = await import('@/utils/snackbar');
+  
+  const accountStore = useAccountStore();
+  const { success } = useSnackbar();
+  
+  await accountStore.logout();
+  success('خروج با موفقیت انجام شد');
+  router.push('/account/auth');
+  
+  isLoggingOut.value = false;
+  showLogoutConfirm.value = false;
 };
 
 // Event handlers

@@ -74,43 +74,36 @@ const props = defineProps({
     validator: (value) => ['small', 'medium', 'large'].includes(value)
   },
   
-  // Loading state
   loading: {
     type: Boolean,
     default: false
   },
-  
-  // Loading text
+
   loadingText: {
     type: String,
     default: 'در حال بارگذاری...'
   },
   
-  // Hover effect
   hover: {
     type: Boolean,
     default: false
   },
   
-  // Shadow
   shadow: {
     type: Boolean,
     default: true
   },
   
-  // Border radius
   rounded: {
     type: Boolean,
     default: true
   },
-  
-  // Full height
+
   fullHeight: {
     type: Boolean,
     default: false
   },
-  
-  // Custom styles
+
   customStyle: {
     type: Object,
     default: () => ({})
@@ -123,7 +116,6 @@ const cardClasses = computed(() => {
     `card-${props.variant}`,
     `card-${props.size}`,
     {
-      'card-hover': props.hover,
       'card-shadow': props.shadow,
       'card-rounded': props.rounded,
       'card-full-height': props.fullHeight,
@@ -150,11 +142,6 @@ const cardStyles = computed(() => {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.card:hover {
-  border-color: #dee2e6;
-}
-
-/* Card Variants */
 .card-default {
   background: #ffffff;
 }
@@ -282,22 +269,10 @@ const cardStyles = computed(() => {
   padding: 24px 32px;
 }
 
-/* Hover Effect */
-.card-hover:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-}
-
-/* Shadow */
 .card-shadow {
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
 }
 
-.card-shadow:hover {
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
-}
-
-/* Rounded */
 .card-rounded {
   border-radius: 12px;
 }
@@ -310,7 +285,6 @@ const cardStyles = computed(() => {
   border-radius: 0 0 12px 12px;
 }
 
-/* Full Height */
 .card-full-height {
   height: 100%;
   display: flex;
@@ -321,7 +295,6 @@ const cardStyles = computed(() => {
   flex: 1;
 }
 
-/* Loading State */
 .card-loading {
   pointer-events: none;
 }

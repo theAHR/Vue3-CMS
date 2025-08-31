@@ -1,14 +1,14 @@
 <template>
-  <div>
-    <Title title="دسته‌بندی بخشنامه‌ها" />
-  </div>
+  <MagazineCategory 
+    title="دسته‌بندی بخشنامه‌ها"
+    :magazine-type="3"
+  />
 </template>
 
 <script setup>
-import Title from '@/components/common/Title.vue';
-// Circular Category management component
+import MagazineCategory from '@/components/common/MagazineCategory.vue';
 </script>
 
 <style scoped>
-/* Circular category management styles */
+/* Additional styles if needed */
 </style> 

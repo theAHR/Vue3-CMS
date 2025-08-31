@@ -53,16 +53,11 @@ const loading = ref(false)
 const handleLogout = async () => {
   loading.value = true
   
-  try {
-    await accountStore.logout()
-    success('خروج با موفقیت انجام شد')
-    router.push('/account/auth')
-  } catch (error) {
-    console.error('Logout error:', error)
-    error('خطا در خروج از سیستم')
-  } finally {
-    loading.value = false
-  }
+  await accountStore.logout()
+  success('خروج با موفقیت انجام شد')
+  router.push('/account/auth')
+  
+  loading.value = false
 }
 
 const cancelLogout = () => {

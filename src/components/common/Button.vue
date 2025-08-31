@@ -12,13 +12,27 @@
     </div>
     
     <div v-else class="button-content">
-      <svg v-if="icon && iconPosition === 'left'" class="button-icon left" viewBox="0 0 24 24" fill="currentColor">
+      <img 
+        v-if="iconSrc && iconPosition === 'left'" 
+        :src="iconSrc" 
+        :alt="text || 'Icon'"
+        class="button-icon left"
+      />
+      
+      <svg v-else-if="icon && iconPosition === 'left'" class="button-icon left" viewBox="0 0 24 24" fill="currentColor">
         <path :d="icon" />
       </svg>
       
       <span v-if="!iconOnly" class="button-text">{{ text }}</span>
       
-      <svg v-if="icon && iconPosition === 'right'" class="button-icon right" viewBox="0 0 24 24" fill="currentColor">
+      <img 
+        v-if="iconSrc && iconPosition === 'right'" 
+        :src="iconSrc" 
+        :alt="text || 'Icon'"
+        class="button-icon right"
+      />
+      
+      <svg v-else-if="icon && iconPosition === 'right'" class="button-icon right" viewBox="0 0 24 24" fill="currentColor">
         <path :d="icon" />
       </svg>
     </div>
@@ -29,80 +43,73 @@
 import { computed } from 'vue';
 
 const props = defineProps({
-  // Button variants
   variant: {
     type: String,
     default: 'primary',
     validator: (value) => ['primary', 'secondary', 'success', 'warning', 'danger', 'info', 'light', 'dark', 'outline'].includes(value)
   },
   
-  // Button sizes
   size: {
     type: String,
     default: 'medium',
     validator: (value) => ['small', 'medium', 'large'].includes(value)
   },
   
-  // Button text
   text: {
     type: String,
     default: ''
   },
   
-  // Icon (SVG path)
   icon: {
     type: String,
     default: ''
   },
   
-  // Icon position
   iconPosition: {
     type: String,
     default: 'left',
     validator: (value) => ['left', 'right'].includes(value)
   },
   
-  // Icon only button
   iconOnly: {
     type: Boolean,
     default: false
   },
   
-  // Loading state
   loading: {
     type: Boolean,
     default: false
   },
   
-  // Disabled state
   disabled: {
     type: Boolean,
     default: false
   },
   
-  // Button type
   type: {
     type: String,
     default: 'button',
     validator: (value) => ['button', 'submit', 'reset'].includes(value)
   },
   
-  // Full width
   fullWidth: {
     type: Boolean,
     default: false
   },
   
-  // Rounded corners
   rounded: {
     type: Boolean,
     default: false
   },
   
-  // Shadow
   shadow: {
     type: Boolean,
     default: false
+  },
+
+  iconSrc: {
+    type: String,
+    default: ''
   }
 });
 
@@ -162,14 +169,12 @@ const handleClick = (event) => {
   opacity: 0.6;
 }
 
-/* Button Variants */
 .btn-primary {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
 }
 
 .btn-primary:hover:not(:disabled) {
-  transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
 }
 
@@ -180,7 +185,6 @@ const handleClick = (event) => {
 
 .btn-secondary:hover:not(:disabled) {
   background: #5a6268;
-  transform: translateY(-2px);
 }
 
 .btn-success {
@@ -189,7 +193,6 @@ const handleClick = (event) => {
 }
 
 .btn-success:hover:not(:disabled) {
-  transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
 }
 
@@ -199,7 +202,6 @@ const handleClick = (event) => {
 }
 
 .btn-warning:hover:not(:disabled) {
-  transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(255, 193, 7, 0.3);
 }
 
@@ -209,7 +211,6 @@ const handleClick = (event) => {
 }
 
 .btn-danger:hover:not(:disabled) {
-  transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(220, 53, 69, 0.3);
 }
 
@@ -219,7 +220,6 @@ const handleClick = (event) => {
 }
 
 .btn-info:hover:not(:disabled) {
-  transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(23, 162, 184, 0.3);
 }
 
@@ -231,7 +231,6 @@ const handleClick = (event) => {
 
 .btn-light:hover:not(:disabled) {
   background: #e9ecef;
-  transform: translateY(-2px);
 }
 
 .btn-dark {
@@ -241,22 +240,20 @@ const handleClick = (event) => {
 
 .btn-dark:hover:not(:disabled) {
   background: #23272b;
-  transform: translateY(-2px);
 }
 
 .btn-outline {
   background: transparent;
-  color: #667eea;
-  border: 2px solid #667eea;
+  background-color: #eeeeee;
+  color: #0c0c0c;
+  border: 2px solid #d4d4d4;
 }
 
 .btn-outline:hover:not(:disabled) {
-  background: #667eea;
+  background: #505050;
   color: white;
-  transform: translateY(-2px);
 }
 
-/* Button Sizes */
 .btn-small {
   padding: 8px 16px;
   font-size: 0.8rem;
@@ -275,7 +272,6 @@ const handleClick = (event) => {
   min-height: 48px;
 }
 
-/* Icon Only Button */
 .btn-icon-only {
   padding: 0;
   min-width: 40px;
@@ -289,7 +285,6 @@ const handleClick = (event) => {
   min-width: 48px;
 }
 
-/* Button Content */
 .button-content {
   display: flex;
   align-items: center;
@@ -308,6 +303,12 @@ const handleClick = (event) => {
   flex-shrink: 0;
 }
 
+.button-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
 .btn-small .button-icon {
   width: 16px;
   height: 16px;
@@ -318,7 +319,6 @@ const handleClick = (event) => {
   height: 20px;
 }
 
-/* Loading State */
 .btn-loading {
   cursor: wait;
 }
@@ -354,17 +354,14 @@ const handleClick = (event) => {
   }
 }
 
-/* Full Width */
 .btn-full-width {
   width: 100%;
 }
 
-/* Rounded */
 .btn-rounded {
   border-radius: 25px;
 }
 
-/* Shadow */
 .btn-shadow {
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
@@ -373,7 +370,6 @@ const handleClick = (event) => {
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
   .btn-medium {
     padding: 10px 20px;

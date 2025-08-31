@@ -42,12 +42,18 @@ export const useAccountStore = defineStore('account', () => {
   async function login(payload) {
     try {
       const res = await accountService.login(payload)
-      const { token: authToken, refreshToken: newRefreshToken, expirationDate } = res.data.object
+      const { accessToken, refreshToken: newRefreshToken, accessTokenExpiration, user: userData } = res.data
 
-      setToken(authToken)
+      setToken(accessToken)
       setRefreshToken(newRefreshToken)
+      
+      // Set user data from login response
+      if (userData) {
+        userData.fullName = (userData.name || '') + ' ' + (userData.lastName || '')
+        setUser(userData)
+      }
 
-      document.cookie = `tspadmin.token=${authToken}; path=/; expires=${new Date(expirationDate).toUTCString()}; SameSite=Strict`
+      document.cookie = `tspadmin.token=${accessToken}; path=/; expires=${new Date(accessTokenExpiration).toUTCString()}; SameSite=Strict`
       document.cookie = `tspadmin.refreshToken=${newRefreshToken}; path=/; max-age=2592000; SameSite=Strict`
 
       return res
@@ -59,20 +65,22 @@ export const useAccountStore = defineStore('account', () => {
   async function logout() {
     try {
       await accountService.logout()
+    } catch (error) {
+      console.warn('Logout API call failed, but continuing with local cleanup:', error)
+    } finally {
+      // Always clean up local state regardless of API call success
       setToken(null)
       setUser({})
       setRefreshToken(null)
       document.cookie = 'tspadmin.token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT'
       document.cookie = 'tspadmin.refreshToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT'
-    } catch (error) {
-      throw error
     }
   }
 
   async function readUserInfo() {
     try {
       const res = await accountService.readUserInfo()
-      const data = res.data.object
+      const data = res.data
       data.fullName = (data.name || '') + ' ' + (data.lastName || '')
       setUser(data)
       return res
@@ -94,12 +102,12 @@ export const useAccountStore = defineStore('account', () => {
   async function refreshAccessToken() {
     try {
       const res = await accountService.refreshToken(refreshToken.value)
-      const { token: newAuthToken, expirationDate } = res.data.object
+      const { accessToken, accessTokenExpiration } = res.data
       
-      setToken(newAuthToken)
-      document.cookie = `tspadmin.token=${newAuthToken}; path=/; expires=${new Date(expirationDate).toUTCString()}; SameSite=Strict`
+      setToken(accessToken)
+      document.cookie = `tspadmin.token=${accessToken}; path=/; expires=${new Date(accessTokenExpiration).toUTCString()}; SameSite=Strict`
       
-      return newAuthToken
+      return accessToken
     } catch (error) {
       await logout()
       throw error

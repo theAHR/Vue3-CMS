@@ -1,14 +1,14 @@
 <template>
-  <div>
-    <Title title="دسته‌بندی دستورالعمل‌ها" />
-  </div>
+  <MagazineCategory 
+    title="دسته‌بندی دستورالعمل‌ها"
+    :magazine-type="4"
+  />
 </template>
 
 <script setup>
-import Title from '@/components/common/Title.vue';
-// Announcement Category management component
+import MagazineCategory from '@/components/common/MagazineCategory.vue';
 </script>
 
 <style scoped>
-/* Instruction category management styles */
+/* Additional styles if needed */
 </style> 

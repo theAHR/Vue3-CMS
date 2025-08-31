@@ -129,7 +129,7 @@ const handleOverlayClick = () => {
 
 .confirm-dialog {
   background: white;
-  border-radius: 20px;
+  border-radius: 0.5rem;
   box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
   max-width: 450px;
   width: 100%;
