@@ -40,13 +40,13 @@
             >
               <img
                 v-if="showPassword"
-                src="@/assets/img/icons/eye-close.svg"
+                src="@/assets/img/icons/eye-open.svg"
                 alt="مخفی کردن"
                 class="eye-icon"
               />
               <img
                 v-else
-                src="@/assets/img/icons/eye-open.svg"
+                src="@/assets/img/icons/eye-close.svg"
                 alt="نمایش"
                 class="eye-icon"
               />

@@ -1,6 +1,6 @@
 const config = {
   development: {
-    baseURL: 'https://apilanding.trustedtsp.ir',
+    baseURL: 'https://apilanding.trustedtsp.ir/',
     imageBaseURL: 'https://apilanding.trustedtsp.ir/images/',
     videoBaseURL: 'https://apilanding.trustedtsp.ir/videos/',
     fileBaseURL: 'https://apilanding.trustedtsp.ir/files/'
