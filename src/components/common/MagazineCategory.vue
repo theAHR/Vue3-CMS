@@ -1,13 +1,13 @@
 <template>
   <div>
     <Title :title="title" />
-    
+
     <VDataTable
       :columns="tableColumns"
-      :items="magazineCategoryStore.getData"
-      :loading="magazineCategoryStore.getLoading"
-      :loading-more="magazineCategoryStore.loadingMore"
-      :has-more-items="magazineCategoryStore.hasMoreItems"
+      :items="categories"
+      :loading="loading"
+      :loading-more="loadingMore"
+      :has-more-items="hasMoreItems"
       :show-load-more="true"
       :actions="tableActions"
       :show-add-button="false"
@@ -16,6 +16,7 @@
       @delete="handleDelete"
       @load-more="handleLoadMore"
       @search="handleSearch"
+      @search-input="handleSearchInput"
     >
       <template #actions>
         <Button 
@@ -28,42 +29,44 @@
     </VDataTable>
 
     <CategoryDialog
-      :show="magazineCategoryStore.showDialog"
-      :category="magazineCategoryStore.editingCategory"
-      :loading="magazineCategoryStore.dialogLoading"
+      :show="showDialog"
+      :category="editingCategory"
+      :loading="dialogLoading"
       @close="closeDialog"
       @submit="handleSubmit"
     />
 
+    <!-- Delete Confirmation Dialog -->
     <ConfirmDialog
-      v-model="magazineCategoryStore.showDeleteConfirm"
+      v-model="showDeleteConfirm"
       title="حذف دسته‌بندی"
       :message="deleteConfirmMessage"
       confirm-text="حذف"
       cancel-text="انصراف"
       type="danger"
-      :loading="magazineCategoryStore.deleteLoading"
+      :loading="deleteLoading"
       @confirm="confirmDelete"
-      @cancel="closeDeleteDialog"
+      @cancel="showDeleteConfirm = false"
     />
 
+    <!-- Details Dialog -->
     <DetailsDialog
-      :show="magazineCategoryStore.showDetailsDialog"
-      :category="magazineCategoryStore.selectedCategory"
-      @close="closeDetailsDialog"
+      :show="showDetailsDialog"
+      :category="selectedCategory"
+      @close="showDetailsDialog = false"
     />
   </div>
 </template>
 
 <script setup>
-import { computed, watch } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import Title from '@/components/common/Title.vue';
 import VDataTable from '@/components/common/VDataTable.vue';
 import CategoryDialog from '@/components/common/CategoryDialog.vue';
 import ConfirmDialog from '@/components/common/ConfirmDialog.vue';
 import DetailsDialog from '@/components/common/DetailsDialog.vue';
 import Button from '@/components/common/Button.vue';
-import { useMagazineCategoryStore } from '@/stores/magazineCategory';
+import { magazineCategoryService } from '@/services/api/magazineCategory';
 import { useSnackbar } from '@/utils/snackbar';
 
 const props = defineProps({
@@ -72,11 +75,12 @@ const props = defineProps({
 });
 
 const { success, error } = useSnackbar();
-const magazineCategoryStore = useMagazineCategoryStore();
 
+
+// Computed properties
 const deleteConfirmMessage = computed(() => {
-  if (!magazineCategoryStore.categoryToDelete) return 'آیا از حذف این دسته‌بندی اطمینان دارید؟';
-  return `آیا از حذف دسته‌بندی "${magazineCategoryStore.categoryToDelete.title}" اطمینان دارید؟`;
+  if (!categoryToDelete.value) return 'آیا از حذف این دسته‌بندی اطمینان دارید؟';
+  return `آیا از حذف دسته‌بندی "${categoryToDelete.value.title}" اطمینان دارید؟`;
 });
 
 const tableColumns = [
@@ -92,55 +96,186 @@ const tableActions = [
   { key: 'delete', label: 'حذف', icon: 'M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z' }
 ];
 
-watch(() => props.magazineType, (newType) => {
-  magazineCategoryStore.setMagazineType(newType);
-  magazineCategoryStore.resetPagination();
-  magazineCategoryStore.fetchCategories();
-}, { immediate: true });
+// Data state
+const categories = ref([]);
+const loading = ref(false);
+const loadingMore = ref(false);
+const currentPage = ref(1);
+const itemsPerPage = ref(25);
+const totalCount = ref(0);
+const hasMoreItems = ref(false);
+const searchQuery = ref('');
 
-const handleLoadMore = async () => {
+// Dialog state
+const showDialog = ref(false);
+const editingCategory = ref(null);
+const dialogLoading = ref(false);
+
+// Delete confirmation state
+const showDeleteConfirm = ref(false);
+const categoryToDelete = ref(null);
+const deleteLoading = ref(false);
+
+// Details dialog state
+const showDetailsDialog = ref(false);
+const selectedCategory = ref(null);
+
+// Methods
+const fetchCategories = async () => {
+  loading.value = true;
   try {
-    await magazineCategoryStore.loadMoreCategories();
+    const params = {
+      skip: (currentPage.value - 1) * itemsPerPage.value,
+      take: itemsPerPage.value,
+      magazineType: props.magazineType,
+      sort: 'des|createDate'
+    };
+    
+    if (searchQuery.value.trim()) {
+      params.include = searchQuery.value.trim();
+    }
+    
+    const response = await magazineCategoryService.search(params);
+    
+    if (response.data.success) {
+      categories.value = response.data.list || [];
+      totalCount.value = response.data.totalCount || 0;
+      hasMoreItems.value = (response.data.totalCount || 0) > (response.data.list || []).length;
+    } else {
+      console.error('Failed to fetch categories:', response.data.message);
+      error('خطا در دریافت دسته‌بندی‌ها');
+    }
   } catch (err) {
-    console.error('Error loading more categories:', err);
-    error('خطا در دریافت دسته‌بندی‌های بیشتر');
+    console.error('Error fetching categories:', err);
+    error('خطا در دریافت دسته‌بندی‌ها');
+  } finally {
+    loading.value = false;
   }
 };
 
-const showAddDialog = () => magazineCategoryStore.showAddDialog();
-const closeDialog = () => magazineCategoryStore.closeDialog();
-const handleEdit = (category) => magazineCategoryStore.showEditDialog(category);
-const handleDetails = (category) => magazineCategoryStore.showDetailsDialog(category);
-const handleDelete = (category) => magazineCategoryStore.showDeleteDialog(category);
+const handleLoadMore = async () => {
+  if (loadingMore.value) return;
+  
+  loadingMore.value = true;
+  try {
+    currentPage.value += 1;
+    const params = {
+      skip: (currentPage.value - 1) * itemsPerPage.value,
+      take: itemsPerPage.value,
+      magazineType: props.magazineType,
+      sort: 'des|createDate'
+    };
+    
+    if (searchQuery.value.trim()) {
+      params.include = searchQuery.value.trim();
+    }
+    
+    const response = await magazineCategoryService.search(params);
+    
+    if (response.data.success) {
+      // Append new items to existing list
+      categories.value = [...categories.value, ...(response.data.list || [])];
+      // Check if there are more items to load
+      hasMoreItems.value = categories.value.length < response.data.totalCount;
+    } else {
+      console.error('Failed to load more categories:', response.data.message);
+      error('خطا در دریافت دسته‌بندی‌های بیشتر');
+      // Revert page number on error
+      currentPage.value -= 1;
+    }
+  } catch (err) {
+    console.error('Error loading more categories:', err);
+    error('خطا در دریافت دسته‌بندی‌های بیشتر');
+    // Revert page number on error
+    currentPage.value -= 1;
+  } finally {
+    loadingMore.value = false;
+  }
+};
+
+const showAddDialog = () => {
+  editingCategory.value = null;
+  showDialog.value = true;
+};
+
+const closeDialog = () => {
+  showDialog.value = false;
+  editingCategory.value = null;
+};
+
+const handleEdit = (category) => {
+  editingCategory.value = category;
+  showDialog.value = true;
+};
+
+const handleDetails = (category) => {
+  selectedCategory.value = category;
+  showDetailsDialog.value = true;
+};
+
+const handleDelete = (category) => {
+  categoryToDelete.value = category;
+  showDeleteConfirm.value = true;
+};
 
 const confirmDelete = async () => {
-  if (!magazineCategoryStore.categoryToDelete) return;
+  if (!categoryToDelete.value) return;
   
+  deleteLoading.value = true;
   try {
-    const response = await magazineCategoryStore.deleteCategory(magazineCategoryStore.categoryToDelete.id);
+    const response = await magazineCategoryService.delete(categoryToDelete.value.id);
     if (response.data.success) {
+      currentPage.value = 1; // Reset to first page
+      await fetchCategories();
       success('دسته‌بندی با موفقیت حذف شد');
-      magazineCategoryStore.closeDeleteDialog();
+      showDeleteConfirm.value = false;
+      categoryToDelete.value = null;
     } else {
       error('خطا در حذف دسته‌بندی: ' + (response.data.message || 'خطای نامشخص'));
     }
   } catch (err) {
     console.error('Error deleting category:', err);
     error('خطا در حذف دسته‌بندی');
+  } finally {
+    deleteLoading.value = false;
   }
 };
 
+const handleSearch = (query) => {
+  searchQuery.value = query;
+  currentPage.value = 1;
+  fetchCategories();
+};
+
+const handleSearchInput = (query) => {
+  searchQuery.value = query;
+};
+
 const handleSubmit = async (formData) => {
+  dialogLoading.value = true;
   try {
     let response;
     if (formData.id) {
-      response = await magazineCategoryStore.updateCategory(formData);
+      // Update existing category
+      response = await magazineCategoryService.update({
+        id: formData.id,
+        title: formData.title,
+        description: formData.description,
+        magazineType: props.magazineType
+      });
     } else {
-      response = await magazineCategoryStore.createCategory(formData);
+      // Create new category
+      response = await magazineCategoryService.create({
+        title: formData.title,
+        description: formData.description,
+        magazineType: props.magazineType
+      });
     }
     
     if (response.data.success) {
-      magazineCategoryStore.closeDialog();
+      closeDialog();
+      currentPage.value = 1; // Reset to first page
+      await fetchCategories();
       success(formData.id ? 'دسته‌بندی با موفقیت ویرایش شد' : 'دسته‌بندی با موفقیت ایجاد شد');
     } else {
       error('خطا در ذخیره دسته‌بندی: ' + (response.data.message || 'خطای نامشخص'));
@@ -148,18 +283,20 @@ const handleSubmit = async (formData) => {
   } catch (err) {
     console.error('Error saving category:', err);
     error('خطا در ذخیره دسته‌بندی');
+  } finally {
+    dialogLoading.value = false;
   }
 };
 
-const handleSearch = (query) => {
-  try {
-    magazineCategoryStore.handleSearch(query);
-  } catch (err) {
-    console.error('Error searching categories:', err);
-    error('خطا در جستجوی دسته‌بندی‌ها');
-  }
-};
-
-const closeDeleteDialog = () => magazineCategoryStore.closeDeleteDialog();
-const closeDetailsDialog = () => magazineCategoryStore.closeDetailsDialog();
+// Lifecycle
+onMounted(() => {
+  fetchCategories();
+});
 </script>
+
+
+
+
+<style scoped>
+/* Additional styles if needed */
+</style>

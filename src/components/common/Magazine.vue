@@ -1,13 +1,13 @@
 <template>
   <div>
     <Title :title="title" />
-    
+
     <VDataTable
       :columns="tableColumns"
-      :items="magazineStore.getData"
-      :loading="magazineStore.getLoading"
-      :loading-more="magazineStore.loadingMore"
-      :has-more-items="magazineStore.hasMoreItems"
+      :items="magazines"
+      :loading="loading"
+      :loading-more="loadingMore"
+      :has-more-items="hasMoreItems"
       :show-load-more="true"
       :actions="tableActions"
       :show-add-button="false"
@@ -16,6 +16,7 @@
       @delete="handleDelete"
       @load-more="handleLoadMore"
       @search="handleSearch"
+      @search-input="handleSearchInput"
     >
       <template #actions>
         <Button 
@@ -28,44 +29,44 @@
     </VDataTable>
 
     <MagazineDialog
-      :show="magazineStore.showDialog"
-      :magazine="magazineStore.editingMagazine"
+      :show="showDialog"
+      :magazine="editingMagazine"
       :magazine-type="magazineType"
-      :loading="magazineStore.dialogLoading"
+      :loading="dialogLoading"
       @close="closeDialog"
       @submit="handleSubmit"
     />
 
     <ConfirmDialog
-      v-model="magazineStore.showDeleteConfirm"
+      v-model="showDeleteConfirm"
       title="حذف مجله"
       :message="deleteConfirmMessage"
       confirm-text="حذف"
       cancel-text="انصراف"
       type="danger"
-      :loading="magazineStore.deleteLoading"
+      :loading="deleteLoading"
       @confirm="confirmDelete"
-      @cancel="closeDeleteDialog"
+      @cancel="showDeleteConfirm = false"
     />
 
     <MagazineDetailsDialog
-      :show="magazineStore.showDetailsDialog"
-      :magazine="magazineStore.selectedMagazine"
+      :show="showDetailsDialog"
+      :magazine="selectedMagazine"
       :magazine-type="magazineType"
-      @close="closeDetailsDialog"
+      @close="showDetailsDialog = false"
     />
   </div>
 </template>
 
 <script setup>
-import { computed, watch } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import Title from '@/components/common/Title.vue';
 import VDataTable from '@/components/common/VDataTable.vue';
 import MagazineDialog from '@/components/common/MagazineDialog.vue';
 import ConfirmDialog from '@/components/common/ConfirmDialog.vue';
 import MagazineDetailsDialog from '@/components/common/MagazineDetailsDialog.vue';
 import Button from '@/components/common/Button.vue';
-import { useMagazineStore } from '@/stores/magazine';
+import { magazineService } from '@/services/api/magazine';
 import { useSnackbar } from '@/utils/snackbar';
 
 const props = defineProps({
@@ -74,11 +75,11 @@ const props = defineProps({
 });
 
 const { success, error } = useSnackbar();
-const magazineStore = useMagazineStore();
+
 
 const deleteConfirmMessage = computed(() => {
-  if (!magazineStore.magazineToDelete) return 'آیا از حذف این مجله اطمینان دارید؟';
-  return `آیا از حذف مجله "${magazineStore.magazineToDelete.title}" اطمینان دارید؟`;
+  if (!magazineToDelete.value) return 'آیا از حذف این مجله اطمینان دارید؟';
+  return `آیا از حذف مجله "${magazineToDelete.value.title}" اطمینان دارید؟`;
 });
 
 const tableColumns = [
@@ -95,69 +96,172 @@ const tableActions = [
   { key: 'delete', label: 'حذف', icon: 'M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z' }
 ];
 
-watch(() => props.magazineType, (newType) => {
-  magazineStore.setMagazineType(newType);
-  magazineStore.resetPagination();
-  magazineStore.fetchMagazines();
-}, { immediate: true });
+const magazines = ref([]);
+const loading = ref(false);
+const loadingMore = ref(false);
+const currentPage = ref(1);
+const itemsPerPage = ref(25);
+const totalCount = ref(0);
+const hasMoreItems = ref(false);
+const searchQuery = ref('');
 
-const handleLoadMore = async () => {
+const showDialog = ref(false);
+const editingMagazine = ref(null);
+const dialogLoading = ref(false);
+
+const showDeleteConfirm = ref(false);
+const magazineToDelete = ref(null);
+const deleteLoading = ref(false);
+
+const showDetailsDialog = ref(false);
+const selectedMagazine = ref(null);
+
+const fetchMagazines = async () => {
+  loading.value = true;
   try {
-    await magazineStore.loadMoreMagazines();
+    const params = {
+      skip: (currentPage.value - 1) * itemsPerPage.value,
+      take: itemsPerPage.value,
+      magazineType: props.magazineType,
+      sort: 'des|createDate'
+    };
+    
+    if (searchQuery.value.trim()) {
+      params.include = searchQuery.value.trim();
+    }
+    
+    const response = await magazineService.search(params);
+    
+    if (response.data.success) {
+      magazines.value = response.data.list || [];
+      totalCount.value = response.data.totalCount || 0;
+      hasMoreItems.value = (response.data.totalCount || 0) > (response.data.list || []).length;
+    } else {
+      console.error('Failed to fetch magazines:', response.data.message);
+      error('خطا در دریافت مجله‌ها');
+    }
   } catch (err) {
-    console.error('Error loading more magazines:', err);
-    error('خطا در دریافت مجله‌های بیشتر');
+    console.error('Error fetching magazines:', err);
+    error('خطا در دریافت مجله‌ها');
+  } finally {
+    loading.value = false;
   }
 };
 
-const showAddDialog = () => magazineStore.showAddDialog();
-const closeDialog = () => magazineStore.closeDialog();
-const handleEdit = (magazine) => magazineStore.showEditDialog(magazine);
-const handleDetails = (magazine) => magazineStore.showDetailsDialog(magazine);
-const handleDelete = (magazine) => magazineStore.showDeleteDialog(magazine);
+const handleLoadMore = async () => {
+  if (loadingMore.value) return;
+  
+  loadingMore.value = true;
+  try {
+    currentPage.value += 1;
+    const params = {
+      skip: (currentPage.value - 1) * itemsPerPage.value,
+      take: itemsPerPage.value,
+      magazineType: props.magazineType,
+      sort: 'des|createDate'
+    };
+    
+    if (searchQuery.value.trim()) {
+      params.include = searchQuery.value.trim();
+    }
+    
+    const response = await magazineService.search(params);
+    
+    if (response.data.success) {
+      magazines.value = [...magazines.value, ...(response.data.list || [])];
+      hasMoreItems.value = magazines.value.length < response.data.totalCount;
+    } else {
+      console.error('Failed to load more magazines:', response.data.message);
+      error('خطا در دریافت مجله‌های بیشتر');
+      currentPage.value -= 1;
+    }
+  } catch (err) {
+    console.error('Error loading more magazines:', err);
+    error('خطا در دریافت مجله‌های بیشتر');
+    currentPage.value -= 1;
+  } finally {
+    loadingMore.value = false;
+  }
+};
+
+const showAddDialog = () => {
+  editingMagazine.value = null;
+  showDialog.value = true;
+};
+
+const closeDialog = () => {
+  showDialog.value = false;
+  editingMagazine.value = null;
+};
+
+const handleEdit = (magazine) => {
+  editingMagazine.value = magazine;
+  showDialog.value = true;
+};
+
+const handleDetails = (magazine) => {
+  selectedMagazine.value = magazine;
+  showDetailsDialog.value = true;
+};
+
+const handleDelete = (magazine) => {
+  magazineToDelete.value = magazine;
+  showDeleteConfirm.value = true;
+};
 
 const confirmDelete = async () => {
-  if (!magazineStore.magazineToDelete) return;
+  if (!magazineToDelete.value) return;
   
+  deleteLoading.value = true;
   try {
-    const response = await magazineStore.deleteMagazine(magazineStore.magazineToDelete.id);
+    const response = await magazineService.delete(magazineToDelete.value.id);
     if (response.data.success) {
+      currentPage.value = 1;
+      await fetchMagazines();
       success('مجله با موفقیت حذف شد');
-      magazineStore.closeDeleteDialog();
+      showDeleteConfirm.value = false;
+      magazineToDelete.value = null;
     } else {
       error('خطا در حذف مجله: ' + (response.data.message || 'خطای نامشخص'));
     }
   } catch (err) {
     console.error('Error deleting magazine:', err);
     error('خطا در حذف مجله');
+  } finally {
+    deleteLoading.value = false;
   }
 };
 
-const closeDeleteDialog = () => magazineStore.closeDeleteDialog();
-const closeDetailsDialog = () => magazineStore.closeDetailsDialog();
+
+
 
 const handleSearch = (query) => {
-  try {
-    magazineStore.handleSearch(query);
-  } catch (err) {
-    console.error('Error searching magazines:', err);
-    error('خطا در جستجوی مجله‌ها');
-  }
+  searchQuery.value = query;
+  currentPage.value = 1;
+  fetchMagazines();
+
+
+
 };
 
-
+const handleSearchInput = (query) => {
+  searchQuery.value = query;
+};
 
 const handleSubmit = async (formData) => {
+  dialogLoading.value = true;
   try {
     let response;
     if (formData.id) {
-      response = await magazineStore.updateMagazine(formData);
+      response = await magazineService.update(formData);
     } else {
-      response = await magazineStore.createMagazine(formData);
+      response = await magazineService.create(formData);
     }
     
     if (response.data.success) {
-      magazineStore.closeDialog();
+      closeDialog();
+      currentPage.value = 1;
+      await fetchMagazines();
       success(formData.id ? 'مجله با موفقیت ویرایش شد' : 'مجله با موفقیت ایجاد شد');
     } else {
       error('خطا در ذخیره مجله: ' + (response.data.message || 'خطای نامشخص'));
@@ -165,7 +269,15 @@ const handleSubmit = async (formData) => {
   } catch (err) {
     console.error('Error saving magazine:', err);
     error('خطا در ذخیره مجله');
+  } finally {
+    dialogLoading.value = false;
   }
 };
+
+onMounted(() => {
+  fetchMagazines();
+});
 </script>
 
+<style scoped>
+</style>
