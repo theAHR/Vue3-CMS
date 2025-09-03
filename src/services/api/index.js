@@ -1,21 +1,40 @@
 export { createRestApi, createRestService } from './rest'
 
-export { default as accountService } from './account'
-export { default as attachmentService } from './attachment'
-export { default as contactRequestService } from './contactRequest'
-export { default as faqService } from './faq'
-export { default as faqCategoryService } from './faqCategory'
-export { default as guideService } from './guide'
-export { default as jobService } from './job'
-export { default as jobRequestService } from './jobRequest'
-export { default as jobSectionService } from './jobSection'
-export { default as magazineService } from './magazine'
-export { default as magazineCategoryService } from './magazineCategory'
-export { default as multimediaService } from './multimedia'
-export { default as rateAndReviewService } from './rateAndReview'
-export { default as roleService } from './role'
-export { default as socialNetworkService } from './socialNetwork'
-export { default as userService } from './user'
+import accountService from './account'
+import attachmentService from './attachment'
+import contactRequestService from './contactRequest'
+import faqService from './faq'
+import faqCategoryService from './faqCategory'
+import guideService from './guide'
+import jobService from './job'
+import jobRequestService from './jobRequest'
+import jobSectionService from './jobSection'
+import magazineService from './magazine'
+import magazineCategoryService from './magazineCategory'
+import multimediaService from './multimedia'
+import rateAndReviewService from './rateAndReview'
+import roleService from './role'
+import socialNetworkService from './socialNetwork'
+import userService from './user'
+
+export {
+  accountService,
+  attachmentService,
+  contactRequestService,
+  faqService,
+  faqCategoryService,
+  guideService,
+  jobService,
+  jobRequestService,
+  jobSectionService,
+  magazineService,
+  magazineCategoryService,
+  multimediaService,
+  rateAndReviewService,
+  roleService,
+  socialNetworkService,
+  userService
+}
 
 export default {
   account: accountService,
