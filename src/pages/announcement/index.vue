@@ -1,14 +1,13 @@
 <template>
-  <div>
-    <Title title="لیست اطلاعیه‌ها" />
-  </div>
+  <Magazine 
+    title="اطلاعیه‌ها"
+    :magazine-type="2"
+  />
 </template>
 
 <script setup>
-import Title from '@/components/common/Title.vue';
-// Announcement management component
+import Magazine from '@/components/common/Magazine.vue';
 </script>
 
 <style scoped>
-/* Announcement management styles */
-</style> 
+</style>

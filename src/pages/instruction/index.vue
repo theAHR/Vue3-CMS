@@ -1,14 +1,13 @@
 <template>
-  <div>
-    <Title title="لیست دستورالعمل‌ها" />
-  </div>
+  <Magazine 
+    title="راهنماها"
+    :magazine-type="4"
+  />
 </template>
 
 <script setup>
-import Title from '@/components/common/Title.vue';
-// Contact Request management component
+import Magazine from '@/components/common/Magazine.vue';
 </script>
 
 <style scoped>
-/* Instruction management styles */
-</style> 
+</style>

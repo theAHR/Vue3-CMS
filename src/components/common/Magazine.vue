@@ -4,7 +4,7 @@
     
     <VDataTable
       :columns="tableColumns"
-      :items="categories"
+      :items="magazines"
       :loading="loading"
       :loading-more="loadingMore"
       :has-more-items="hasMoreItems"
@@ -20,7 +20,7 @@
     >
       <template #actions>
         <Button 
-          text="افزودن دسته‌بندی"
+          text="افزودن مجله"
           variant="success"
           iconSrc="/src/assets/img/icons/add.svg"
           @click="showAddDialog"
@@ -28,18 +28,18 @@
       </template>
     </VDataTable>
 
-    <CategoryDialog
+    <MagazineDialog
       :show="showDialog"
-      :category="editingCategory"
+      :magazine="editingMagazine"
+      :magazine-type="magazineType"
       :loading="dialogLoading"
       @close="closeDialog"
       @submit="handleSubmit"
     />
 
-    <!-- Delete Confirmation Dialog -->
     <ConfirmDialog
       v-model="showDeleteConfirm"
-      title="حذف دسته‌بندی"
+      title="حذف مجله"
       :message="deleteConfirmMessage"
       confirm-text="حذف"
       cancel-text="انصراف"
@@ -49,10 +49,10 @@
       @cancel="showDeleteConfirm = false"
     />
 
-    <!-- Details Dialog -->
-    <DetailsDialog
+    <MagazineDetailsDialog
       :show="showDetailsDialog"
-      :category="selectedCategory"
+      :magazine="selectedMagazine"
+      :magazine-type="magazineType"
       @close="showDetailsDialog = false"
     />
   </div>
@@ -62,11 +62,11 @@
 import { ref, onMounted, computed } from 'vue';
 import Title from '@/components/common/Title.vue';
 import VDataTable from '@/components/common/VDataTable.vue';
-import CategoryDialog from '@/components/common/CategoryDialog.vue';
+import MagazineDialog from '@/components/common/MagazineDialog.vue';
 import ConfirmDialog from '@/components/common/ConfirmDialog.vue';
-import DetailsDialog from '@/components/common/DetailsDialog.vue';
+import MagazineDetailsDialog from '@/components/common/MagazineDetailsDialog.vue';
 import Button from '@/components/common/Button.vue';
-import { magazineCategoryService } from '@/services/api/magazineCategory';
+import { magazineService } from '@/services/api/magazine';
 import { useSnackbar } from '@/utils/snackbar';
 
 const props = defineProps({
@@ -76,16 +76,16 @@ const props = defineProps({
 
 const { success, error } = useSnackbar();
 
-// Computed properties
 const deleteConfirmMessage = computed(() => {
-  if (!categoryToDelete.value) return 'آیا از حذف این دسته‌بندی اطمینان دارید؟';
-  return `آیا از حذف دسته‌بندی "${categoryToDelete.value.title}" اطمینان دارید؟`;
+  if (!magazineToDelete.value) return 'آیا از حذف این مجله اطمینان دارید؟';
+  return `آیا از حذف مجله "${magazineToDelete.value.title}" اطمینان دارید؟`;
 });
 
 const tableColumns = [
   { key: 'rowNumber', label: 'ردیف', class: 'text-center' },
   { key: 'title', label: 'عنوان', class: 'text-right' },
   { key: 'createDate', label: 'تاریخ ایجاد', class: 'text-center' },
+  { key: 'active', label: 'وضعیت', class: 'text-center' },
   { key: 'actions', label: 'عملیات', class: 'text-center' }
 ];
 
@@ -95,8 +95,7 @@ const tableActions = [
   { key: 'delete', label: 'حذف', icon: 'M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z' }
 ];
 
-// Data state
-const categories = ref([]);
+const magazines = ref([]);
 const loading = ref(false);
 const loadingMore = ref(false);
 const currentPage = ref(1);
@@ -105,22 +104,18 @@ const totalCount = ref(0);
 const hasMoreItems = ref(false);
 const searchQuery = ref('');
 
-// Dialog state
 const showDialog = ref(false);
-const editingCategory = ref(null);
+const editingMagazine = ref(null);
 const dialogLoading = ref(false);
 
-// Delete confirmation state
 const showDeleteConfirm = ref(false);
-const categoryToDelete = ref(null);
+const magazineToDelete = ref(null);
 const deleteLoading = ref(false);
 
-// Details dialog state
 const showDetailsDialog = ref(false);
-const selectedCategory = ref(null);
+const selectedMagazine = ref(null);
 
-// Methods
-const fetchCategories = async () => {
+const fetchMagazines = async () => {
   loading.value = true;
   try {
     const params = {
@@ -134,19 +129,19 @@ const fetchCategories = async () => {
       params.include = searchQuery.value.trim();
     }
     
-    const response = await magazineCategoryService.search(params);
+    const response = await magazineService.search(params);
     
     if (response.data.success) {
-      categories.value = response.data.list || [];
+      magazines.value = response.data.list || [];
       totalCount.value = response.data.totalCount || 0;
       hasMoreItems.value = (response.data.totalCount || 0) > (response.data.list || []).length;
     } else {
-      console.error('Failed to fetch categories:', response.data.message);
-      error('خطا در دریافت دسته‌بندی‌ها');
+      console.error('Failed to fetch magazines:', response.data.message);
+      error('خطا در دریافت مجله‌ها');
     }
   } catch (err) {
-    console.error('Error fetching categories:', err);
-    error('خطا در دریافت دسته‌بندی‌ها');
+    console.error('Error fetching magazines:', err);
+    error('خطا در دریافت مجله‌ها');
   } finally {
     loading.value = false;
   }
@@ -169,23 +164,19 @@ const handleLoadMore = async () => {
       params.include = searchQuery.value.trim();
     }
     
-    const response = await magazineCategoryService.search(params);
+    const response = await magazineService.search(params);
     
     if (response.data.success) {
-      // Append new items to existing list
-      categories.value = [...categories.value, ...(response.data.list || [])];
-      // Check if there are more items to load
-      hasMoreItems.value = categories.value.length < response.data.totalCount;
+      magazines.value = [...magazines.value, ...(response.data.list || [])];
+      hasMoreItems.value = magazines.value.length < response.data.totalCount;
     } else {
-      console.error('Failed to load more categories:', response.data.message);
-      error('خطا در دریافت دسته‌بندی‌های بیشتر');
-      // Revert page number on error
+      console.error('Failed to load more magazines:', response.data.message);
+      error('خطا در دریافت مجله‌های بیشتر');
       currentPage.value -= 1;
     }
   } catch (err) {
-    console.error('Error loading more categories:', err);
-    error('خطا در دریافت دسته‌بندی‌های بیشتر');
-    // Revert page number on error
+    console.error('Error loading more magazines:', err);
+    error('خطا در دریافت مجله‌های بیشتر');
     currentPage.value -= 1;
   } finally {
     loadingMore.value = false;
@@ -193,48 +184,48 @@ const handleLoadMore = async () => {
 };
 
 const showAddDialog = () => {
-  editingCategory.value = null;
+  editingMagazine.value = null;
   showDialog.value = true;
 };
 
 const closeDialog = () => {
   showDialog.value = false;
-  editingCategory.value = null;
+  editingMagazine.value = null;
 };
 
-const handleEdit = (category) => {
-  editingCategory.value = category;
+const handleEdit = (magazine) => {
+  editingMagazine.value = magazine;
   showDialog.value = true;
 };
 
-const handleDetails = (category) => {
-  selectedCategory.value = category;
+const handleDetails = (magazine) => {
+  selectedMagazine.value = magazine;
   showDetailsDialog.value = true;
 };
 
-const handleDelete = (category) => {
-  categoryToDelete.value = category;
+const handleDelete = (magazine) => {
+  magazineToDelete.value = magazine;
   showDeleteConfirm.value = true;
 };
 
 const confirmDelete = async () => {
-  if (!categoryToDelete.value) return;
+  if (!magazineToDelete.value) return;
   
   deleteLoading.value = true;
   try {
-    const response = await magazineCategoryService.delete(categoryToDelete.value.id);
+    const response = await magazineService.delete(magazineToDelete.value.id);
     if (response.data.success) {
-      currentPage.value = 1; // Reset to first page
-      await fetchCategories();
-      success('دسته‌بندی با موفقیت حذف شد');
+      currentPage.value = 1;
+      await fetchMagazines();
+      success('مجله با موفقیت حذف شد');
       showDeleteConfirm.value = false;
-      categoryToDelete.value = null;
+      magazineToDelete.value = null;
     } else {
-      error('خطا در حذف دسته‌بندی: ' + (response.data.message || 'خطای نامشخص'));
+      error('خطا در حذف مجله: ' + (response.data.message || 'خطای نامشخص'));
     }
   } catch (err) {
-    console.error('Error deleting category:', err);
-    error('خطا در حذف دسته‌بندی');
+    console.error('Error deleting magazine:', err);
+    error('خطا در حذف مجله');
   } finally {
     deleteLoading.value = false;
   }
@@ -243,7 +234,7 @@ const confirmDelete = async () => {
 const handleSearch = (query) => {
   searchQuery.value = query;
   currentPage.value = 1;
-  fetchCategories();
+  fetchMagazines();
 };
 
 const handleSearchInput = (query) => {
@@ -255,44 +246,31 @@ const handleSubmit = async (formData) => {
   try {
     let response;
     if (formData.id) {
-      // Update existing category
-      response = await magazineCategoryService.update({
-        id: formData.id,
-        title: formData.title,
-        description: formData.description,
-        magazineType: props.magazineType
-      });
+      response = await magazineService.update(formData);
     } else {
-      // Create new category
-      response = await magazineCategoryService.create({
-        title: formData.title,
-        description: formData.description,
-        magazineType: props.magazineType
-      });
+      response = await magazineService.create(formData);
     }
     
     if (response.data.success) {
       closeDialog();
-      currentPage.value = 1; // Reset to first page
-      await fetchCategories();
-      success(formData.id ? 'دسته‌بندی با موفقیت ویرایش شد' : 'دسته‌بندی با موفقیت ایجاد شد');
+      currentPage.value = 1;
+      await fetchMagazines();
+      success(formData.id ? 'مجله با موفقیت ویرایش شد' : 'مجله با موفقیت ایجاد شد');
     } else {
-      error('خطا در ذخیره دسته‌بندی: ' + (response.data.message || 'خطای نامشخص'));
+      error('خطا در ذخیره مجله: ' + (response.data.message || 'خطای نامشخص'));
     }
   } catch (err) {
-    console.error('Error saving category:', err);
-    error('خطا در ذخیره دسته‌بندی');
+    console.error('Error saving magazine:', err);
+    error('خطا در ذخیره مجله');
   } finally {
     dialogLoading.value = false;
   }
 };
 
-// Lifecycle
 onMounted(() => {
-  fetchCategories();
+  fetchMagazines();
 });
 </script>
 
 <style scoped>
-/* Additional styles if needed */
 </style>
