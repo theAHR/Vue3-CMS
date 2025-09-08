@@ -27,19 +27,19 @@
     </div>
 
     <!-- Data Table -->
-    <Card class="table-card">
+    <Card variant="table" class="table-card">
       <div class="table-container">
         <table class="data-table">
           <thead>
             <tr>
-              <th v-for="column in columns" :key="column.key" :class="column.class">
+              <th v-for="column in columns" :key="column.key" :class="[column.class, getColumnHeaderClass(column.key)]">
                 {{ column.label }}
               </th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="(item, index) in items" :key="item.id || index" class="table-row">
-              <td v-for="column in columns" :key="column.key" :class="column.class">
+              <td v-for="column in columns" :key="column.key" :class="[column.class, getColumnCellClass(column.key)]">
                 <!-- Row Number -->
                 <span v-if="column.key === 'rowNumber'">
                   {{ index + 1 }}
@@ -56,8 +56,8 @@
                 </span>
                 
                 <!-- Status -->
-                <span v-else-if="column.key === 'status'" class="status-cell">
-                  <span :class="item.statusClass">{{ item[column.key] }}</span>
+                <span v-else-if="column.key === 'active'" class="status-cell">
+                  <StatusBadge :is-active="item[column.key]" />
                 </span>
                 
                 <!-- Actions -->
@@ -98,7 +98,7 @@
         </div>
         
         <!-- Loading State -->
-        <div v-if="loading" class="loading-state">
+        <div v-if="loading" class="loading-overlay">
           <div class="loading-spinner"></div>
         </div>
       </div>
@@ -122,6 +122,7 @@ import Button from './Button.vue';
 import Card from './Card.vue';
 import SearchBar from './SearchBar.vue';
 import FormattedDate from './FormattedDate.vue';
+import StatusBadge from './StatusBadge.vue';
 
 const props = defineProps({
   columns: { type: Array, required: true },
@@ -166,6 +167,40 @@ const handleLoadMore = () => {
   emit('load-more');
 };
 
+const getColumnHeaderClass = (key) => {
+  switch (key) {
+    case 'title':
+      return 'title-header';
+    case 'rowNumber':
+      return 'row-number-header';
+    case 'createDate':
+      return 'date-header';
+    case 'active':
+      return 'status-header';
+    case 'actions':
+      return 'actions-header';
+    default:
+      return 'default-header';
+  }
+};
+
+const getColumnCellClass = (key) => {
+  switch (key) {
+    case 'title':
+      return 'title-cell';
+    case 'rowNumber':
+      return 'row-number-cell';
+    case 'createDate':
+      return 'date-cell';
+    case 'active':
+      return 'status-cell';
+    case 'actions':
+      return 'actions-cell';
+    default:
+      return 'default-cell';
+  }
+};
+
 // Close actions menu when clicking outside
 document.addEventListener('click', (event) => {
   if (!event.target.closest('.actions-dropdown')) {
@@ -198,11 +233,6 @@ document.addEventListener('click', (event) => {
   gap: 0.75rem;
 }
 
-.table-card {
-  background: white;
-  border-radius: 0.5rem;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-}
 
 .table-container {
   position: relative;
@@ -212,15 +242,46 @@ document.addEventListener('click', (event) => {
 .data-table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed;
 }
 
 .data-table th {
   padding: 0.5rem;
   text-align: right;
   font-weight: 500;
-  color: #8b8b8b;
+  color: #ffffff;
   border-bottom: 1px solid #e5e7eb;
   font-size: 0.875rem;
+  background-color: #444444;
+}
+
+/* Column header widths */
+.title-header {
+  width: 40%;
+}
+
+.row-number-header {
+  width: 8%;
+  text-align: center;
+}
+
+.date-header {
+  width: 16%;
+  text-align: center;
+}
+
+.status-header {
+  width: 16%;
+  text-align: center;
+}
+
+.actions-header {
+  width: 20%;
+  text-align: center;
+}
+
+.default-header {
+  width: 20%;
 }
 
 .data-table td {
@@ -230,28 +291,30 @@ document.addEventListener('click', (event) => {
   font-size: 0.8rem;
 }
 
+/* Column cell widths */
 .title-cell {
   font-weight: 500;
   color: #1f2937;
+  width: 40%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.row-number-cell {
+  width: 8%;
+  text-align: center;
 }
 
 .date-cell {
+  width: 16%;
   color: #6b7280;
   font-size: 0.8rem;
 }
 
 .status-cell {
+  width: 16%;
   text-align: center;
-}
-
-.status-cell .status-active {
-  color: #059669;
-  font-weight: 500;
-}
-
-.status-cell .status-inactive {
-  color: #dc2626;
-  font-weight: 500;
 }
 
 .actions-cell {
@@ -330,24 +393,27 @@ document.addEventListener('click', (event) => {
   color: #6b7280;
 }
 
-.loading-state {
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(4px);
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 3rem 1rem;
-  color: #6b7280;
-  min-height: 200px;
+  z-index: 10;
 }
 
 .loading-spinner {
-  width: 2rem;
-  height: 2rem;
-  border: 3px solid #e5e7eb;
-  border-top: 3px solid #6E63C4;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 3px solid #f3f4f6;
+  border-top: 3px solid #5c5c5c;
   border-radius: 50%;
   animation: spin 1s linear infinite;
-  margin-bottom: 1rem;
 }
 
 @keyframes spin {
@@ -360,6 +426,5 @@ document.addEventListener('click', (event) => {
   justify-content: center;
   padding: 1rem;
   border-top: 1px solid #e5e7eb;
-  background-color: #f9fafb;
 }
 </style>

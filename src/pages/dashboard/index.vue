@@ -6,6 +6,7 @@
         title="عملیات سریع"
         icon="M13 10V3L4 14h7v7l9-11h-7z"
         variant="warning"
+        size="large"
         class="quick-actions-card"
       >
         <div class="quick-actions-grid">
@@ -36,6 +37,7 @@
         :title="stat.title"
         :icon="stat.icon"
         variant="default"
+        size="large"
         hover
         class="stat-card"
       >
@@ -50,6 +52,7 @@
         title="آمار کلی"
         icon="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
         variant="primary"
+        size="large"
         class="chart-card"
       >
         <div class="chart-container">
@@ -65,6 +68,7 @@
         title="توزیع محتوا"
         icon="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"
         variant="success"
+        size="large"
         class="chart-card"
       >
         <div class="chart-container">

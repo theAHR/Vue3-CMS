@@ -64,7 +64,7 @@ const props = defineProps({
   variant: {
     type: String,
     default: 'default',
-    validator: (value) => ['default', 'primary', 'success', 'warning', 'danger', 'info'].includes(value)
+    validator: (value) => ['default', 'primary', 'success', 'warning', 'danger', 'info', 'table'].includes(value)
   },
   
   // Card sizes
@@ -171,16 +171,40 @@ const cardStyles = computed(() => {
   border-color: #17a2b8;
 }
 
+.card-table {
+  background: #ffffff;
+  border: 1px solid #e9ecef;
+  padding: 0;
+}
+
+.card-table .card-header {
+  margin: 0;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e9ecef;
+  background: #f8f9fa;
+}
+
+.card-table .card-footer {
+  margin: 0;
+  padding: 20px 24px;
+  border-top: 1px solid #e9ecef;
+  background: #f8f9fa;
+}
+
+.card-table .card-body {
+  padding: 0;
+}
+
 .card-small {
   padding: 16px;
 }
 
 .card-medium {
-  padding: 24px;
+  padding: 0px;
 }
 
 .card-large {
-  padding: 32px;
+  padding: 28px;
 }
 
 .card-header {

@@ -100,7 +100,7 @@ const deleteConfirmMessage = computed(() => {
 
 const tableColumns = [
   { key: 'rowNumber', label: 'ردیف', class: 'text-center' },
-  { key: 'title', label: 'عنوان', class: 'text-right' },
+  { key: 'title', label: 'عنوان', class: 'text-center' },
   { key: 'createDate', label: 'تاریخ ایجاد', class: 'text-center' },
   { key: 'actions', label: 'عملیات', class: 'text-center' }
 ];

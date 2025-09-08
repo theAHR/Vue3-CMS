@@ -19,6 +19,7 @@ export { default as Form } from './common/Form.vue'
 export { default as Loading } from './common/Loading.vue'
 export { default as Title } from './common/Title.vue'
 export { default as EmptyState } from './common/EmptyState.vue'
+export { default as StatusBadge } from './common/StatusBadge.vue'
 
 // Dashboard Components (to be created)
 export { default as DashboardStats } from './dashboard/DashboardStats.vue'

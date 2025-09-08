@@ -6,8 +6,15 @@
     :type="type"
   >
     <div v-if="loading" class="loading-spinner">
-      <svg class="spinner" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M12 2A10 10 0 1 0 12 22A10 10 0 0 0 12 2M12 4A8 8 0 0 1 12 20A8 8 0 0 1 12 4M12 6A6 6 0 0 0 12 18A6 6 0 0 0 12 6M12 8A4 4 0 0 1 12 16A4 4 0 0 1 12 8Z"/>
+      <svg class="spinner" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2V6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M12 18V22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M4.93 4.93L7.76 7.76" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M16.24 16.24L19.07 19.07" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M2 12H6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M18 12H22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M4.93 19.07L7.76 16.24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M16.24 7.76L19.07 4.93" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </div>
     
@@ -244,15 +251,15 @@ const handleClick = (event) => {
 
 .btn-outline {
   background: transparent;
-  background-color: #eeeeee;
+  background-color: #f8f8f8;
   color: #0c0c0c;
-  border: 2px solid #d4d4d4;
+  border: 1px solid #cccccc;
 }
 
 .btn-outline:hover:not(:disabled) {
-  background: #505050;
-  color: white;
+  box-shadow: 0 8px 25px rgba(202, 202, 202, 0.3);
 }
+
 
 .btn-small {
   padding: 8px 16px;
@@ -261,7 +268,7 @@ const handleClick = (event) => {
 }
 
 .btn-medium {
-  padding: 12px 24px;
+  padding: 10px 18px;
   font-size: 0.9rem;
   min-height: 40px;
 }
