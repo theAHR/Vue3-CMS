@@ -298,7 +298,7 @@ const cardStyles = computed(() => {
 }
 
 .card-rounded {
-  border-radius: 12px;
+  border-radius: 8px;
 }
 
 .card-rounded .card-header {

@@ -2,7 +2,6 @@
   <Transition name="dialog">
     <div v-if="show" class="dialog-overlay" @click="closeDialog">
       <div class="dialog-content" @click.stop>
-        <!-- Dialog Header -->
         <div class="dialog-header">
           <button class="close-button" @click="closeDialog">
             <svg viewBox="0 0 24 24" fill="currentColor" class="close-icon">
@@ -12,18 +11,12 @@
           <h3 class="dialog-title">{{ isEdit ? 'ویرایش مجله' : 'ایجاد مجله' }}</h3>
         </div>
 
-        <!-- Dialog Body -->
         <div class="dialog-body">
-          <!-- Loading Overlay -->
           <div v-if="isLoadingMagazine" class="loading-overlay">
-            <div class="loading-content">
-              <div class="loading-spinner"></div>
-              <p class="loading-text">در حال بارگذاری اطلاعات مجله...</p>
-            </div>
+            <div class="loading-spinner"></div>
           </div>
           
           <form @submit.prevent="handleSubmit" :class="{ 'loading-form': isLoadingMagazine }">
-            <!-- Title Field -->
             <div class="form-group">
               <label for="title" class="form-label">
                 عنوان
@@ -36,12 +29,16 @@
                 class="form-input"
                 :class="{ 'error': errors.title }"
                 placeholder="وارد کنید ..."
-                required
+                @input="clearError('title')"
               />
-              <span v-if="errors.title" class="error-message">{{ errors.title }}</span>
+              <div v-if="errors.title" class="error-notification">
+                <svg class="error-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <span class="error-text">{{ errors.title }}</span>
+              </div>
             </div>
 
-            <!-- Text Field -->
             <div class="form-group">
               <label for="text" class="form-label">
                 متن خبر
@@ -54,84 +51,109 @@
                 :class="{ 'error': errors.text }"
                 placeholder="وارد کنید ..."
                 rows="4"
-                required
+                @input="clearError('text')"
               ></textarea>
-              <span v-if="errors.text" class="error-message">{{ errors.text }}</span>
-            </div>
-
-            <!-- Category Field -->
-            <div class="form-group">
-              <label for="categoryId" class="form-label">
-                دسته‌بندی
-                <span class="required">*</span>
-              </label>
-              <select
-                id="categoryId"
-                v-model="formData.categoryId"
-                class="form-input"
-                :class="{ 'error': errors.categoryId }"
-                required
-              >
-                <option value="">انتخاب دسته‌بندی</option>
-                <option
-                  v-for="category in categories"
-                  :key="category.id"
-                  :value="category.id"
-                >
-                  {{ category.title }}
-                </option>
-              </select>
-              <span v-if="errors.categoryId" class="error-message">{{ errors.categoryId }}</span>
-            </div>
-
-            <!-- Active Field -->
-            <div class="form-group">
-              <div class="checkbox-group">
-                <input
-                  id="active"
-                  v-model="formData.active"
-                  type="checkbox"
-                  class="checkbox-input"
-                />
-                <label for="active" class="checkbox-label">فعال</label>
+              <div v-if="errors.text" class="error-notification">
+                <svg class="error-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <span class="error-text">{{ errors.text }}</span>
               </div>
             </div>
 
-            <!-- Images Field -->
-            <div class="form-group">
-              <label class="form-label">تصاویر (حداکثر 5 عدد)</label>
-              <div class="images-container">
-                <div v-for="(image, index) in formData.images" :key="index" class="image-item">
-                  <span class="image-name">{{ image }}</span>
-                  <button
-                    type="button"
-                    @click="removeImage(index)"
-                    class="remove-image-btn"
-                  >
-                    حذف
-                  </button>
+            <div class="form-row">
+              <div class="form-group form-group-half">
+                <VSelect
+                  id="categoryId"
+                  v-model="formData.categoryId"
+                  :options="categoryOptions"
+                  placeholder="انتخاب دسته‌بندی"
+                  :error-message="errors.categoryId"
+                  @change="clearError('categoryId')"
+                />
+              </div>
+
+              <div class="form-group form-group-half">
+                <div class="toggle-group">
+                  <label for="active" class="toggle-label">وضعیت : </label>
+                  <div class="toggle-switch">
+                    <input
+                      id="active"
+                      v-model="formData.active"
+                      type="checkbox"
+                      class="toggle-input"
+                    />
+                    <span class="toggle-slider"></span>
+                  </div>
+                  <span class="toggle-text">{{ formData.active ? 'فعال' : 'غیرفعال' }}</span>
                 </div>
-                
-                <div v-if="formData.images.length < 5" class="upload-section">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">
+                تصاویر (حداکثر سایز تصویر 1 مگابایت)
+                <span class="required">*</span>
+              </label>
+              <div 
+                class="images-container"
+                :class="{ 'error': errors.images }"
+                @dragover="handleDragOver"
+                @dragenter="handleDragEnter"
+                @dragleave="handleDragLeave"
+                @drop="handleDrop"
+              >
+                <div v-if="formData.images.length < 5" class="upload-box" @click="triggerFileInput">
                   <input
                     ref="fileInput"
                     type="file"
                     accept="image/*"
-                    @change="handleFileUpload"
+                    @change="handleFileInputChange"
                     class="hidden"
                   />
-                  <button
-                    type="button"
-                    @click="triggerFileInput"
-                    class="upload-btn"
-                  >
-                    افزودن تصویر
-                  </button>
+                  <div v-if="isUploading" class="upload-loading">
+                    <div class="upload-spinner"></div>
+                  </div>
+                  <div v-else class="upload-content">
+                    <div class="upload-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                      </svg>
+                    </div>
+                    <span class="upload-text">افزودن</span>
+                  </div>
+                </div>
+
+                <div v-for="(image, index) in formData.images" :key="index" class="image-preview-item">
+                  <div class="image-preview-container">
+                    <img 
+                      :src="getImagePreviewUrl(image)" 
+                      :alt="`تصویر ${index + 1}`"
+                      class="image-preview"
+                    />
+                    <div class="image-overlay">
+                      <button
+                        type="button"
+                        @click="removeImage(index)"
+                        class="remove-image-btn"
+                        title="حذف تصویر"
+                      >
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
+              <div v-if="errors.images" class="error-notification">
+                <svg class="error-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <span class="error-text">{{ errors.images }}</span>
+              </div>
             </div>
-
-            <!-- Form Actions -->
+            
             <div class="form-actions">
               <button 
                 class="btn btn-confirm success" 
@@ -171,6 +193,7 @@ import { attachmentService } from '@/services/api/attachment';
 import { magazineCategoryService } from '@/services/api/magazineCategory';
 import { magazineService } from '@/services/api/magazine';
 import { useSnackbar } from '@/utils/snackbar';
+import VSelect from './VSelect.vue';
 
 const props = defineProps({
   show: { type: Boolean, default: false },
@@ -191,12 +214,21 @@ const formData = ref({
   images: []
 });
 
+
 const categories = ref([]);
 const errors = ref({});
 const fileInput = ref(null);
 const isLoadingMagazine = ref(false);
+const isUploading = ref(false);
 
 const isEdit = computed(() => !!props.magazine);
+
+const categoryOptions = computed(() => {
+  return categories.value.map(category => ({
+    value: category.id,
+    label: category.title
+  }));
+});
 
 const fetchCategories = async () => {
   try {
@@ -211,7 +243,6 @@ const fetchCategories = async () => {
       categories.value = response.data.list || [];
     }
   } catch (err) {
-    console.error('Error fetching categories:', err);
     error('خطا در دریافت دسته‌بندی‌ها');
   }
 };
@@ -232,24 +263,25 @@ const fetchMagazineById = async (id) => {
         images: images
       };
       
-      console.log('Fetched magazine data:', magazineData);
-      console.log('Processed images:', images);
-      
-      // Fetch categories after magazine data is loaded
       await fetchCategories();
     }
   } catch (err) {
-    console.error('Error fetching magazine:', err);
     error('خطا در دریافت اطلاعات مجله');
   } finally {
     isLoadingMagazine.value = false;
   }
 };
 
-const handleFileUpload = async (event) => {
-  const file = event.target.files[0];
+const handleFileUpload = async (file) => {
   if (!file) return;
 
+  const maxSize = 1024 * 1024; // 1024KB in bytes
+  if (file.size > maxSize) {
+    error('حجم فایل نباید بیشتر از ۱ مگابایت باشد');
+    return;
+  }
+
+  isUploading.value = true;
   try {
     const uploadFormData = new FormData();
     uploadFormData.append('FileData', file);
@@ -268,8 +300,19 @@ const handleFileUpload = async (event) => {
       error('خطا در بارگذاری تصویر');
     }
   } catch (err) {
-    console.error('Error uploading file:', err);
     error('خطا در بارگذاری تصویر');
+  } finally {
+    isUploading.value = false;
+    if (fileInput.value) {
+      fileInput.value.value = '';
+    }
+  }
+};
+
+const handleFileInputChange = (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    handleFileUpload(file);
   }
 };
 
@@ -278,18 +321,61 @@ const removeImage = (index) => {
 };
 
 const triggerFileInput = () => {
-  if (fileInput.value) {
+  if (fileInput.value && !isUploading.value) {
     fileInput.value.click();
   }
 };
 
+const getImagePreviewUrl = (imageData) => {
+  if (!imageData) return '';
+  
+  // Handle both string (image name) and object (full response) formats
+  const imageName = typeof imageData === 'string' ? imageData : imageData.imageName || imageData;
+  
+  if (!imageName) return '';
+  
+  return `https://apilanding.trustedtsp.ir/images/${imageName}`;
+};
+
+
+// Drag and drop handlers
+const handleDragOver = (event) => {
+  event.preventDefault();
+  event.stopPropagation();
+};
+
+const handleDragEnter = (event) => {
+  event.preventDefault();
+  event.stopPropagation();
+  event.currentTarget.classList.add('drag-over');
+};
+
+const handleDragLeave = (event) => {
+  event.preventDefault();
+  event.stopPropagation();
+  event.currentTarget.classList.remove('drag-over');
+};
+
+const handleDrop = (event) => {
+  event.preventDefault();
+  event.stopPropagation();
+  event.currentTarget.classList.remove('drag-over');
+  
+  const files = event.dataTransfer.files;
+  if (files.length > 0) {
+    const file = files[0];
+    if (file.type.startsWith('image/')) {
+      handleFileUpload(file);
+    } else {
+      error('لطفاً فقط فایل‌های تصویری انتخاب کنید');
+    }
+  }
+};
+
 const handleDialogOpen = () => {
-  console.log('Dialog opened, magazine prop:', props.magazine);
   if (props.magazine && props.magazine.id) {
-    console.log('Fetching full magazine data for ID:', props.magazine.id);
     fetchMagazineById(props.magazine.id);
   } else {
-    console.log('No magazine provided, resetting form and fetching categories');
     resetForm();
     fetchCategories();
   }
@@ -316,10 +402,16 @@ const validateForm = () => {
     errors.value.categoryId = 'انتخاب دسته‌بندی الزامی است';
   }
   
+  if (!formData.value.images || formData.value.images.length === 0) {
+    errors.value.images = 'حداقل یک تصویر الزامی است';
+  }
+  
   return Object.keys(errors.value).length === 0;
 };
 
-const handleSubmit = () => {
+const handleSubmit = (event) => {
+  event.preventDefault();
+  
   if (validateForm()) {
     const submitData = {
       id: props.magazine?.id || null,
@@ -332,6 +424,12 @@ const handleSubmit = () => {
     };
 
     emit('submit', submitData);
+  }
+};
+
+const clearError = (field) => {
+  if (errors.value[field]) {
+    delete errors.value[field];
   }
 };
 
@@ -350,36 +448,11 @@ const closeDialog = () => {
   emit('close');
 };
 
-watch(() => props.magazine, (newMagazine) => {
-  try {
-    if (newMagazine && typeof newMagazine === 'object' && newMagazine.id) {
-      console.log('Magazine prop changed, fetching full data for ID:', newMagazine.id);
-      fetchMagazineById(newMagazine.id);
-    } else if (!newMagazine) {
-      resetForm();
-    }
-  } catch (error) {
-    console.error('Error updating form data:', error);
-    resetForm();
-  }
-}, { immediate: true, deep: true });
-
 watch(() => props.show, (show) => {
-  try {
-    if (show) {
-      handleDialogOpen();
-    } else {
-      resetForm();
-    }
-  } catch (error) {
-    console.error('Error handling show change:', error);
-  }
-}, { immediate: true });
-
-watch([() => props.show, () => props.magazine], ([show, magazine]) => {
-  if (show && magazine && magazine.id) {
-    console.log('Both show and magazine changed, fetching data for ID:', magazine.id);
-    fetchMagazineById(magazine.id);
+  if (show) {
+    handleDialogOpen();
+  } else {
+    resetForm();
   }
 }, { immediate: true });
 
@@ -412,7 +485,9 @@ onMounted(() => {
   width: 100%;
   max-width: 600px;
   max-height: 90vh;
-  overflow-y: auto;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .dialog-header {
@@ -454,10 +529,43 @@ onMounted(() => {
 
 .dialog-body {
   padding: 1.5rem;
+  overflow-y: auto;
+  flex: 1;
+  max-height: calc(90vh - 120px);
+}
+
+.dialog-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dialog-body::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.dialog-body::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.dialog-body::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }
 
 .form-group {
   margin-bottom: 1.5rem;
+}
+
+.form-row {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  align-items: center;
+}
+
+.form-group-half {
+  flex: 1;
+  margin-bottom: 0;
 }
 
 .form-label {
@@ -485,10 +593,11 @@ onMounted(() => {
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
+
 .form-input:focus,
 .form-textarea:focus {
   outline: none;
-  border-color: #3b82f6;
+  border-color: #747474;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
@@ -515,88 +624,288 @@ onMounted(() => {
   margin-top: 0.25rem;
 }
 
-.checkbox-group {
+.error-notification {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  margin-top: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 0.375rem;
+  animation: fadeIn 0.2s ease-out;
 }
 
-.checkbox-input {
+.error-icon {
   width: 1rem;
   height: 1rem;
-  accent-color: #3b82f6;
+  color: #ef4444;
+  flex-shrink: 0;
 }
 
-.checkbox-label {
+.error-text {
+  font-size: 0.75rem;
+  color: #dc2626;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.toggle-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.toggle-label {
   font-size: 0.875rem;
+  font-weight: 500;
   color: #374151;
+  margin: 0;
+}
+
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 3rem;
+  height: 1.5rem;
+}
+
+.toggle-input {
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: 0;
   cursor: pointer;
+  z-index: 1;
+}
+
+.toggle-slider {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #cbd5e1;
+  transition: 0.3s;
+  border-radius: 1.5rem;
+  pointer-events: none;
+}
+
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 1.25rem;
+  width: 1.25rem;
+  left: 0.125rem;
+  bottom: 0.125rem;
+  background-color: white;
+  transition: 0.3s;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.toggle-input:checked + .toggle-slider {
+  background-color: #40ac6d;
+}
+
+.toggle-input:checked + .toggle-slider:before {
+  transform: translateX(1.5rem);
+}
+
+.toggle-text {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #636464;
+  min-width: 3rem;
 }
 
 .images-container {
-  border: 1px solid #d1d5db;
-  border-radius: 0.375rem;
-  padding: 1rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 0.75rem;
+  padding: 1.25rem;
   background-color: #f9fafb;
+  border: 1px dashed #d1d5db;
+  border-radius: 0.5rem;
+  min-height: 80px;
+  transition: border-color 0.2s ease-in-out;
 }
 
-.image-item {
+.images-container:hover {
+  border-color: #5a5a5a;
+}
+
+.images-container.drag-over {
+  border-color: #3b82f6;
+  background-color: #eff6ff;
+  border-style: solid;
+}
+
+.images-container.error {
+  border-color: #ef4444;
+  background-color: #fef2f2;
+}
+
+.upload-box {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
-  padding: 0.5rem;
+  justify-content: center;
+  min-height: 80px;
+  border: 1px dashed #d1d5db;
+  border-radius: 0.5rem;
   background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 0.25rem;
-  margin-bottom: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  position: relative;
+  overflow: hidden;
 }
 
-.image-name {
-  font-size: 0.875rem;
+.upload-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.75rem;
+  text-align: center;
+}
+
+.upload-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: #6b7280;
+  transition: color 0.2s ease-in-out;
+}
+
+.upload-box:hover .upload-icon {
+  color: #9b9ea1;
+}
+
+.upload-text {
+  font-size: 0.75rem;
+  font-weight: 500;
   color: #374151;
-  flex: 1;
-  margin-right: 1rem;
+}
+
+.upload-hint {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.upload-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.upload-spinner {
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 3px solid #f3f4f6;
+  border-top: 3px solid #5c5c5c;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.image-preview-item {
+  position: relative;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease-in-out;
+  padding: 0.5rem;
+}
+
+.image-preview-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.image-preview-container {
+  position: relative;
+  width: 100%;
+  height: 80px;
+  overflow: hidden;
+}
+
+.image-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 0.5rem;
+}
+
+.image-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease-in-out;
+}
+
+.image-preview-item:hover .image-overlay {
+  background: rgba(0, 0, 0, 0.3);
 }
 
 .remove-image-btn {
-  background: #ef4444;
+  background: rgba(239, 68, 68, 0.9);
   color: white;
   border: none;
-  padding: 0.25rem 0.75rem;
-  border-radius: 0.25rem;
-  font-size: 0.75rem;
+  border-radius: 50%;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  transition: background-color 0.15s ease-in-out;
+  opacity: 0;
+  transition: all 0.2s ease-in-out;
+  backdrop-filter: blur(4px);
+}
+
+.image-preview-item:hover .remove-image-btn {
+  opacity: 1;
 }
 
 .remove-image-btn:hover {
-  background: #dc2626;
+  background: rgba(220, 38, 38, 1);
+  transform: scale(1.1);
 }
 
-.upload-section {
-  margin-top: 0.5rem;
+.remove-image-btn svg {
+  width: 1rem;
+  height: 1rem;
 }
 
-.upload-btn {
-  background: #3b82f6;
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 0.375rem;
-  font-size: 0.875rem;
-  cursor: pointer;
-  transition: background-color 0.15s ease-in-out;
-}
-
-.upload-btn:hover {
-  background: #2563eb;
-}
 
 .form-actions {
   display: flex;
   gap: 0.75rem;
   justify-content: space-between;
   margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
 }
 
 .btn {
@@ -622,27 +931,15 @@ onMounted(() => {
 
 .btn-confirm {
   color: white;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .btn-confirm.success {
   background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
 }
-
-.btn-confirm:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-}
-
 .btn-cancel {
-  background: #f1f5f9;
-  color: #64748b;
-}
-
-.btn-cancel:hover:not(:disabled) {
-  background: #e2e8f0;
-  color: #475569;
-  transform: translateY(-1px);
+  background: #636363;
+  color: #ffffff;
 }
 
 .loading-icon {
@@ -702,6 +999,24 @@ onMounted(() => {
   .btn {
     width: 100%;
   }
+
+  .images-container {
+    grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+    gap: 0.5rem;
+  }
+
+  .upload-box,
+  .image-preview-container {
+    min-height: 70px;
+  }
+
+  .upload-content {
+    padding: 0.5rem;
+  }
+
+  .upload-text {
+    font-size: 0.625rem;
+  }
 }
 
 /* Transition animations */
@@ -735,7 +1050,8 @@ onMounted(() => {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -743,25 +1059,13 @@ onMounted(() => {
   border-radius: 0.5rem;
 }
 
-.loading-content {
-  text-align: center;
-  padding: 2rem;
-}
-
 .loading-spinner {
-  width: 3rem;
-  height: 3rem;
-  border: 3px solid #e5e7eb;
-  border-top: 3px solid #3b82f6;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 3px solid #f3f4f6;
+  border-top: 3px solid #5c5c5c;
   border-radius: 50%;
   animation: spin 1s linear infinite;
-  margin: 0 auto 1rem;
-}
-
-.loading-text {
-  color: #6b7280;
-  font-size: 0.875rem;
-  margin: 0;
 }
 
 .loading-form {
@@ -771,5 +1075,9 @@ onMounted(() => {
 
 .dialog-body {
   position: relative;
+}
+
+.hidden {
+  display: none !important;
 }
 </style>

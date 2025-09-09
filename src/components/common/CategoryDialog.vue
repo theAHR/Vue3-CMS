@@ -28,9 +28,14 @@
               class="form-input"
               :class="{ 'error': errors.title }"
               placeholder="وارد کنید ..."
-              required
+              @input="clearError('title')"
             />
-            <span v-if="errors.title" class="error-message">{{ errors.title }}</span>
+            <div v-if="errors.title" class="error-notification">
+              <svg class="error-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              <span class="error-text">{{ errors.title }}</span>
+            </div>
           </div>
 
           <!-- Description Field -->
@@ -43,8 +48,14 @@
               :class="{ 'error': errors.description }"
               placeholder="وارد کنید ..."
               rows="3"
+              @input="clearError('description')"
             ></textarea>
-            <span v-if="errors.description" class="error-message">{{ errors.description }}</span>
+            <div v-if="errors.description" class="error-notification">
+              <svg class="error-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              <span class="error-text">{{ errors.description }}</span>
+            </div>
           </div>
 
           <!-- Form Actions -->
@@ -124,76 +135,52 @@ const resetForm = () => {
   errors.value = {};
 };
 
-// Watch for category changes
-watch(() => props.category, (newCategory) => {
-  try {
-    if (newCategory && typeof newCategory === 'object') {
-      formData.value = {
-        title: newCategory.title || '',
-        description: newCategory.description || ''
-      };
-    } else {
-      resetForm();
-    }
-  } catch (error) {
-    console.error('Error updating form data:', error);
+watch(() => props.show, (show) => {
+  if (show && props.category) {
+    formData.value = {
+      title: props.category.title || '',
+      description: props.category.description || ''
+    };
+  } else if (!show) {
     resetForm();
   }
 }, { immediate: true });
 
-// Watch for show changes
-watch(() => props.show, (show) => {
-  try {
-    if (!show) {
-      resetForm();
-    }
-  } catch (error) {
-    console.error('Error handling show change:', error);
-  }
-});
-
 const validateForm = () => {
-  try {
-    errors.value = {};
-    
-    if (!formData.value.title || !formData.value.title.trim()) {
-      errors.value.title = 'عنوان الزامی است';
-    } else if (formData.value.title.trim().length < 2) {
-      errors.value.title = 'عنوان باید حداقل ۲ کاراکتر باشد';
-    } else if (formData.value.title.trim().length > 100) {
-      errors.value.title = 'عنوان نمی‌تواند بیشتر از ۱۰۰ کاراکتر باشد';
-    }
-    
-    if (formData.value.description && formData.value.description.length > 500) {
-      errors.value.description = 'توضیحات نمی‌تواند بیشتر از ۵۰۰ کاراکتر باشد';
-    }
-    
-    return Object.keys(errors.value).length === 0;
-  } catch (error) {
-    console.error('Error validating form:', error);
-    return false;
+  errors.value = {};
+  
+  if (!formData.value.title || !formData.value.title.trim()) {
+    errors.value.title = 'عنوان الزامی است';
+  } else if (formData.value.title.trim().length < 2) {
+    errors.value.title = 'عنوان باید حداقل ۲ کاراکتر باشد';
+  } else if (formData.value.title.trim().length > 100) {
+    errors.value.title = 'عنوان نمی‌تواند بیشتر از ۱۰۰ کاراکتر باشد';
   }
+  
+  if (formData.value.description && formData.value.description.length > 500) {
+    errors.value.description = 'توضیحات نمی‌تواند بیشتر از ۵۰۰ کاراکتر باشد';
+  }
+  
+  return Object.keys(errors.value).length === 0;
 };
 
 const handleSubmit = () => {
-  try {
-    if (validateForm()) {
-      emit('submit', {
-        ...formData.value,
-        id: props.category?.id
-      });
-    }
-  } catch (error) {
-    console.error('Error submitting form:', error);
+  if (validateForm()) {
+    emit('submit', {
+      ...formData.value,
+      id: props.category?.id
+    });
+  }
+};
+
+const clearError = (field) => {
+  if (errors.value[field]) {
+    delete errors.value[field];
   }
 };
 
 const closeDialog = () => {
-  try {
-    emit('close');
-  } catch (error) {
-    console.error('Error closing dialog:', error);
-  }
+  emit('close');
 };
 </script>
 
@@ -219,7 +206,9 @@ const closeDialog = () => {
   width: 100%;
   max-width: 500px;
   max-height: 90vh;
-  overflow-y: auto;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .dialog-header {
@@ -261,6 +250,8 @@ const closeDialog = () => {
 
 .dialog-body {
   padding: 1.5rem;
+  overflow: hidden;
+  flex: 1;
 }
 
 .form-group {
@@ -315,11 +306,41 @@ const closeDialog = () => {
   min-height: 80px;
 }
 
-.error-message {
-  display: block;
-  font-size: 0.75rem;
+.error-notification {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 0.375rem;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.error-icon {
+  width: 1rem;
+  height: 1rem;
   color: #ef4444;
-  margin-top: 0.25rem;
+  flex-shrink: 0;
+}
+
+.error-text {
+  font-size: 0.75rem;
+  color: #dc2626;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .form-actions {

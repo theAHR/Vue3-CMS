@@ -106,7 +106,9 @@ const closeDialog = () => {
   width: 100%;
   max-width: 500px;
   max-height: 90vh;
-  overflow-y: auto;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .dialog-header {
@@ -149,6 +151,8 @@ const closeDialog = () => {
 
 .dialog-body {
   padding: 1.5rem;
+  overflow: hidden;
+  flex: 1;
 }
 
 .detail-item {

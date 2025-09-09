@@ -136,7 +136,7 @@ const formattedDate = computed(() => {
 
 const getImageUrl = (imageName) => {
   if (!imageName) return '';
-  return `https://apilanding.trustedtsp.ir/api/v1/attachment/${imageName}`;
+  return `https://apilanding.trustedtsp.ir/images/${imageName}`;
 };
 
 const viewImageFullscreen = (imageUrl) => {
@@ -226,7 +226,9 @@ watch(() => fullMagazineData.value, (newVal) => {
   width: 100%;
   max-width: 600px;
   max-height: 90vh;
-  overflow-y: auto;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .dialog-header {
@@ -269,6 +271,8 @@ watch(() => fullMagazineData.value, (newVal) => {
 
 .dialog-body {
   padding: 1.5rem;
+  overflow: hidden;
+  flex: 1;
 }
 
 .detail-item {
