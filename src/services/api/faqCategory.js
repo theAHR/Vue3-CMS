@@ -5,7 +5,7 @@ export const faqCategoryService = {
   ...createRestService(apiClient, 'faq-types'),
 
   search(params = {}) {
-    return apiClient.get('/api/v1/faq-types/search', { params })
+    return apiClient.get('/api/v1/faq-types', { params })
   }
 }
 

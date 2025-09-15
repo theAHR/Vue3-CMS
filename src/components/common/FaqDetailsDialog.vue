@@ -9,38 +9,48 @@
               <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
             </svg>
           </button>
-          <h3 class="dialog-title">جزئیات دسته‌بندی</h3>
+          <h3 class="dialog-title">جزئیات سوال متداول</h3>
         </div>
 
         <!-- Dialog Body -->
         <div class="dialog-body">
-          <div class="detail-item">
-            <label class="detail-label">عنوان:</label>
-            <span class="detail-value">{{ category?.title || 'نامشخص' }}</span>
-          </div>
-          
-          <div class="detail-item">
-            <label class="detail-label">تاریخ ایجاد:</label>
-            <span class="detail-value">
-              <FormattedDate :date="category?.createDate" format="full" />
-            </span>
+          <div v-if="fullFaqData">
+            <div class="detail-item">
+              <label class="detail-label">عنوان سوال:</label>
+              <span class="detail-value">{{ fullFaqData.faqTitle || 'نامشخص' }}</span>
+            </div>
+
+            <div class="detail-item">
+              <label class="detail-label">پاسخ:</label>
+              <div class="detail-value detail-text">{{ fullFaqData.faqAnswer || 'بدون پاسخ' }}</div>
+            </div>
+
+            <div class="detail-item">
+              <label class="detail-label">وضعیت:</label>
+              <span 
+                :class="fullFaqData.active ? 'status-active' : 'status-inactive'"
+                class="detail-value status-badge"
+              >
+                {{ fullFaqData.active ? 'فعال' : 'غیرفعال' }}
+              </span>
+            </div>
+
+            <div class="detail-item">
+              <label class="detail-label">دسته‌بندی سوال:</label>
+              <span class="detail-value">{{ categoryTitle || 'نامشخص' }}</span>
+            </div>
+
+            <div class="detail-item">
+              <label class="detail-label">تاریخ ایجاد:</label>
+              <span class="detail-value">{{ formattedDate || 'نامشخص' }}</span>
+            </div>
           </div>
         </div>
 
         <!-- Dialog Actions -->
         <div class="dialog-actions">
           <button class="btn btn-close" @click="closeDialog">
-            <svg v-if="loading" class="loading-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 2V6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M12 18V22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M4.93 4.93L7.76 7.76" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M16.24 16.24L19.07 19.07" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M2 12H6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M18 12H22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M4.93 19.07L7.76 16.24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M16.24 7.76L19.07 4.93" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            <span v-else>بستن</span>
+            <span>بستن</span>
           </button>
         </div>
       </div>
@@ -49,29 +59,83 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
-import FormattedDate from './FormattedDate.vue';
+import { ref, computed, watch } from 'vue';
+import { faqCategoryService } from '@/services/api/faqCategory';
+import { faqService } from '@/services/api/faq';
 
 const props = defineProps({
-  show: {
-    type: Boolean,
-    default: false
-  },
-  category: {
-    type: Object,
-    default: null
-  },
-  loading: {
-    type: Boolean,
-    default: false
-  }
+  show: { type: Boolean, default: false },
+  faq: { type: Object, default: null }
 });
 
 const emit = defineEmits(['close']);
 
+const categoryTitle = ref('');
+const fullFaqData = ref(null);
+
+const formattedDate = computed(() => {
+  const faqData = fullFaqData.value || props.faq;
+  if (!faqData?.createDate) return '-';
+  return new Date(faqData.createDate).toLocaleDateString('fa-IR');
+});
+
 const closeDialog = () => {
   emit('close');
 };
+
+const fetchFullFaqData = async (id) => {
+  try {
+    const response = await faqService.getById(id);
+    if (response.data.success && response.data.object) {
+      fullFaqData.value = response.data.object;
+      console.log('Fetched full FAQ data for details:', fullFaqData.value);
+    }
+  } catch (err) {
+    console.error('Error fetching full FAQ data:', err);
+  }
+};
+
+const fetchCategoryTitle = async () => {
+  const faqData = fullFaqData.value || props.faq;
+  if (!faqData?.faqTypeId) {
+    categoryTitle.value = '-';
+    return;
+  }
+
+  try {
+    const response = await faqCategoryService.search({
+      skip: 0,
+      take: 25,
+      sort: 'des|createDate'
+    });
+    
+    if (response.data.success) {
+      const category = response.data.list?.find(cat => cat.id === faqData.faqTypeId);
+      categoryTitle.value = category?.displayName || '-';
+    }
+  } catch (err) {
+    console.error('Error fetching category:', err);
+    categoryTitle.value = '-';
+  }
+};
+
+watch(() => props.show, (newVal) => {
+  if (newVal && props.faq && props.faq.id) {
+    fetchFullFaqData(props.faq.id);
+  }
+});
+
+watch(() => props.faq, (newVal) => {
+  if (newVal && newVal.id && props.show) {
+    fetchFullFaqData(newVal.id);
+  }
+});
+
+watch(() => fullFaqData.value, (newVal) => {
+  if (newVal) {
+    fetchCategoryTitle();
+  }
+});
 </script>
 
 <style scoped>
@@ -94,7 +158,7 @@ const closeDialog = () => {
   border-radius: 0.5rem;
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
   width: 100%;
-  max-width: 500px;
+  max-width: 600px;
   max-height: 90vh;
   overflow: hidden;
   display: flex;
@@ -158,6 +222,10 @@ const closeDialog = () => {
   background-color: #f3f4f6;
 }
 
+.detail-item-full {
+  flex-direction: column;
+}
+
 .detail-label {
   font-weight: 600;
   color: #374151;
@@ -166,9 +234,40 @@ const closeDialog = () => {
   margin-left: 1rem;
 }
 
+.detail-item-full .detail-label {
+  margin-left: 0;
+  margin-bottom: 0.5rem;
+}
+
 .detail-value {
   color: #6b7280;
   flex: 1;
+}
+
+.detail-text {
+  white-space: pre-wrap;
+  line-height: 1.6;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.status-active {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.status-inactive {
+  background-color: #fee2e2;
+  color: #991b1b;
 }
 
 .dialog-actions {
@@ -194,7 +293,7 @@ const closeDialog = () => {
 
 .btn-close {
   background: #f1f5f9;
-  color: #565758;
+  color: #64748b;
 }
 
 .btn-close:hover:not(:disabled) {
@@ -208,17 +307,6 @@ const closeDialog = () => {
   cursor: not-allowed;
 }
 
-.loading-icon {
-  width: 1.25rem;
-  height: 1.25rem;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
 /* RTL specific adjustments */
 .dialog-header {
   flex-direction: row-reverse;
@@ -226,6 +314,10 @@ const closeDialog = () => {
 
 .detail-item {
   flex-direction: row;
+}
+
+.detail-item-full {
+  flex-direction: column;
 }
 
 .dialog-actions {
