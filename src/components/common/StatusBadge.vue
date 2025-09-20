@@ -10,7 +10,11 @@ import { computed } from 'vue';
 const props = defineProps({
   isActive: {
     type: Boolean,
-    required: true
+    required: false
+  },
+  state: {
+    type: [Number, String],
+    required: false
   },
   activeText: {
     type: String,
@@ -33,6 +37,15 @@ const props = defineProps({
 });
 
 const statusText = computed(() => {
+  if (props.state !== undefined && props.state !== null) {
+    const stateMap = {
+      1: 'ثبت شده',
+      2: 'درحال بررسی',
+      3: 'تایید شده',
+      4: 'رد شده'
+    };
+    return stateMap[props.state] || 'نامشخص';
+  }
   return props.isActive ? props.activeText : props.inactiveText;
 });
 
@@ -40,7 +53,19 @@ const statusClass = computed(() => {
   const baseClass = 'status-badge';
   const sizeClass = `status-badge--${props.size}`;
   const variantClass = `status-badge--${props.variant}`;
-  const stateClass = props.isActive ? 'status-badge--active' : 'status-badge--inactive';
+  
+  let stateClass = '';
+  if (props.state !== undefined && props.state !== null) {
+    const stateClassMap = {
+      1: 'status-badge--registered',
+      2: 'status-badge--reviewing',
+      3: 'status-badge--approved',
+      4: 'status-badge--rejected'
+    };
+    stateClass = stateClassMap[props.state] || 'status-badge--unknown';
+  } else {
+    stateClass = props.isActive ? 'status-badge--active' : 'status-badge--inactive';
+  }
   
   return [baseClass, sizeClass, variantClass, stateClass].join(' ');
 });
@@ -120,6 +145,71 @@ const statusClass = computed(() => {
 
 .status-badge--inactive.status-badge--minimal {
   color: #ff2e2e;
+}
+
+.status-badge--registered {
+  color: #6b7280;
+  background-color: #f3f4f6;
+}
+
+.status-badge--registered.status-badge--outline {
+  border-color: #6b7280;
+}
+
+.status-badge--registered.status-badge--minimal {
+  color: #6b7280;
+}
+
+.status-badge--reviewing {
+  color: #d97706;
+  background-color: #fef3c7;
+}
+
+.status-badge--reviewing.status-badge--outline {
+  border-color: #d97706;
+}
+
+.status-badge--reviewing.status-badge--minimal {
+  color: #d97706;
+}
+
+.status-badge--approved {
+  color: #059669;
+  background-color: #d1fae5;
+}
+
+.status-badge--approved.status-badge--outline {
+  border-color: #059669;
+}
+
+.status-badge--approved.status-badge--minimal {
+  color: #059669;
+}
+
+.status-badge--rejected {
+  color: #dc2626;
+  background-color: #fee2e2;
+}
+
+.status-badge--rejected.status-badge--outline {
+  border-color: #dc2626;
+}
+
+.status-badge--rejected.status-badge--minimal {
+  color: #dc2626;
+}
+
+.status-badge--unknown {
+  color: #6b7280;
+  background-color: #f9fafb;
+}
+
+.status-badge--unknown.status-badge--outline {
+  border-color: #6b7280;
+}
+
+.status-badge--unknown.status-badge--minimal {
+  color: #6b7280;
 }
 
 .status-badge:hover {

@@ -5,7 +5,7 @@ export const jobService = {
   ...createRestService(apiClient, 'jobs'),
 
   search(params = {}) {
-    return apiClient.get('/api/v1/jobs/search', { params })
+    return apiClient.get('/api/v1/jobs', { params })
   }
 }
 

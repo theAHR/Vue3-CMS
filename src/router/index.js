@@ -86,13 +86,13 @@ const routes = [
       },
       {
         path: '/job',
-        component: () => import('@/pages/job/index.vue'),
+        component: () => import('@/pages/jobSection/index.vue'),
         name: 'بخش سازمانی',
         meta: { title: 'بخش سازمانی' }
       },
       {
         path: '/job-sections',
-        component: () => import('@/pages/jobSection/index.vue'),
+        component: () => import('@/pages/job/index.vue'),
         name: 'مشاغل',
         meta: { title: 'لیست مشاغل' }
       },

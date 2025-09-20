@@ -29,68 +29,66 @@
     <!-- Data Table -->
     <Card variant="table" class="table-card">
       <div class="table-container">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th v-for="column in columns" :key="column.key" :class="[column.class, getColumnHeaderClass(column.key)]">
-                {{ column.label }}
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(item, index) in items" :key="item.id || index" class="table-row">
-              <td v-for="column in columns" :key="column.key" :class="[column.class, getColumnCellClass(column.key)]">
-                <!-- Row Number -->
-                <span v-if="column.key === 'rowNumber'">
-                  {{ index + 1 }}
-                </span>
-                
-                <!-- Title -->
-                <span v-else-if="column.key === 'title'" class="title-cell">
-                  {{ item[column.key] }}
-                </span>
-                
-                <!-- Date -->
-                <span v-else-if="column.key === 'createDate'" class="date-cell">
-                  <FormattedDate :date="item[column.key]" format="date-only" />
-                </span>
-                
-                <!-- Status -->
-                <span v-else-if="column.key === 'active'" class="status-cell">
-                  <StatusBadge :is-active="item[column.key]" />
-                </span>
-                
-                <!-- Actions -->
-                <div v-else-if="column.key === 'actions'" class="actions-cell">
-                  <div class="actions-dropdown">
-                    <button class="actions-trigger" @click="toggleActions(index)">
-                      <svg viewBox="0 0 24 24" fill="currentColor" class="actions-icon">
-                        <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
-                      </svg>
-                    </button>
-                    
-                    <div v-if="openActionsIndex === index" class="actions-menu">
-                      <button 
-                        v-for="action in actions" 
-                        :key="action.key"
-                        class="action-item"
-                        @click="handleAction(action.key, item)"
-                      >
-                        <svg v-if="action.icon" viewBox="0 0 24 24" fill="currentColor" class="action-icon">
-                          <path :d="action.icon" />
+        <div class="table-scroll-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th v-for="column in columns" :key="column.key" :class="[column.class, getColumnHeaderClass(column.key)]">
+                  {{ column.label }}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(item, index) in items" :key="item.id || index" class="table-row">
+                <td v-for="column in columns" :key="column.key" :class="[column.class, getColumnCellClass(column.key)]">
+                  <!-- Row Number -->
+                  <span v-if="column.key === 'rowNumber'">
+                    {{ index + 1 }}
+                  </span>
+                  
+                  <!-- Title -->
+                  <span v-else-if="column.key === 'title'" class="title-cell">
+                    {{ item[column.key] }}
+                  </span>
+                  
+                  <!-- Date -->
+                  <span v-else-if="column.key === 'createDate'" class="date-cell">
+                    <FormattedDate :date="item[column.key]" format="date-only" />
+                  </span>
+                  
+                  <!-- Status -->
+                  <span v-else-if="column.key === 'active'" class="status-cell">
+                    <StatusBadge :is-active="item[column.key]" />
+                  </span>
+                  
+                  <!-- State -->
+                  <span v-else-if="column.key === 'state'" class="status-cell">
+                    <StatusBadge :state="item[column.key]" />
+                  </span>
+                  
+                  <!-- Job Title -->
+                  <span v-else-if="column.key === 'jobTitle'" class="title-cell">
+                    {{ item.job?.title || 'نامشخص' }}
+                  </span>
+                  
+                  <!-- Actions -->
+                  <div v-else-if="column.key === 'actions'" class="actions-cell">
+                    <div class="actions-dropdown">
+                      <button class="actions-trigger" @click="toggleActions(index, $event)">
+                        <svg viewBox="0 0 24 24" fill="currentColor" class="actions-icon">
+                          <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
                         </svg>
-                        {{ action.label }}
                       </button>
                     </div>
                   </div>
-                </div>
-                
-                <!-- Default cell content -->
-                <span v-else>{{ item[column.key] }}</span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+                  
+                  <!-- Default cell content -->
+                  <span v-else>{{ item[column.key] }}</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
         
         <!-- Empty State -->
         <div v-if="items.length === 0 && !loading" class="empty-state">
@@ -113,6 +111,28 @@
         />
       </div>
     </Card>
+
+    <!-- Actions Menu Portal -->
+    <div 
+      v-if="openActionsIndex !== null" 
+      class="actions-menu"
+      :style="{
+        top: menuPosition.top + 'px',
+        left: menuPosition.left + 'px'
+      }"
+    >
+      <button 
+        v-for="action in actions" 
+        :key="action.key"
+        class="action-item"
+        @click="handleAction(action.key, items[openActionsIndex])"
+      >
+        <svg v-if="action.icon" viewBox="0 0 24 24" fill="currentColor" class="action-icon">
+          <path :d="action.icon" />
+        </svg>
+        {{ action.label }}
+      </button>
+    </div>
   </div>
 </template>
 
@@ -145,9 +165,22 @@ const props = defineProps({
 const emit = defineEmits(['add', 'edit', 'details', 'delete', 'search', 'search-input', 'load-more']);
 
 const openActionsIndex = ref(null);
+const menuPosition = ref({ top: 0, left: 0 });
 
-const toggleActions = (index) => {
-  openActionsIndex.value = openActionsIndex.value === index ? null : index;
+const toggleActions = (index, event) => {
+  if (openActionsIndex.value === index) {
+    openActionsIndex.value = null;
+  } else {
+    const button = event.target.closest('.actions-trigger');
+    const rect = button.getBoundingClientRect();
+    
+    menuPosition.value = {
+      top: rect.bottom + window.scrollY + 5,
+      left: rect.right + window.scrollX - 120
+    };
+    
+    openActionsIndex.value = index;
+  }
 };
 
 const handleAction = (actionKey, item) => {
@@ -179,6 +212,16 @@ const getColumnHeaderClass = (key) => {
       return 'status-header';
     case 'actions':
       return 'actions-header';
+    case 'applicantFullName':
+      return 'applicantFullName-header';
+    case 'applicantMobileNumber':
+      return 'applicantMobileNumber-header';
+    case 'applicantMail':
+      return 'applicantMail-header';
+    case 'jobTitle':
+      return 'jobTitle-header';
+    case 'state':
+      return 'state-header';
     default:
       return 'default-header';
   }
@@ -196,6 +239,16 @@ const getColumnCellClass = (key) => {
       return 'status-cell';
     case 'actions':
       return 'actions-cell';
+    case 'applicantFullName':
+      return 'applicantFullName-cell';
+    case 'applicantMobileNumber':
+      return 'applicantMobileNumber-cell';
+    case 'applicantMail':
+      return 'applicantMail-cell';
+    case 'jobTitle':
+      return 'jobTitle-cell';
+    case 'state':
+      return 'state-cell';
     default:
       return 'default-cell';
   }
@@ -203,7 +256,7 @@ const getColumnCellClass = (key) => {
 
 // Close actions menu when clicking outside
 document.addEventListener('click', (event) => {
-  if (!event.target.closest('.actions-dropdown')) {
+  if (!event.target.closest('.actions-dropdown') && !event.target.closest('.actions-menu')) {
     openActionsIndex.value = null;
   }
 });
@@ -237,12 +290,40 @@ document.addEventListener('click', (event) => {
 .table-container {
   position: relative;
   min-height: 200px;
+  overflow: hidden;
+}
+
+.table-scroll-wrapper {
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f1f5f9;
+}
+
+.table-scroll-wrapper::-webkit-scrollbar {
+  height: 8px;
+}
+
+.table-scroll-wrapper::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+.table-scroll-wrapper::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.table-scroll-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }
 
 .data-table {
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
+  min-width: 800px;
 }
 
 .data-table th {
@@ -284,6 +365,31 @@ document.addEventListener('click', (event) => {
   width: 20%;
 }
 
+.applicantFullName-header {
+  width: 18%;
+  text-align: center;
+}
+
+.applicantMobileNumber-header {
+  width: 15%;
+  text-align: center;
+}
+
+.applicantMail-header {
+  width: 20%;
+  text-align: center;
+}
+
+.jobTitle-header {
+  width: 18%;
+  text-align: center;
+}
+
+.state-header {
+  width: 14%;
+  text-align: center;
+}
+
 .data-table td {
   padding: 0.75rem;
   border-bottom: 1px solid #f3f4f6;
@@ -322,6 +428,41 @@ document.addEventListener('click', (event) => {
   text-align: center;
 }
 
+.applicantFullName-cell {
+  width: 18%;
+  text-align: center;
+  font-weight: 500;
+}
+
+.applicantMobileNumber-cell {
+  width: 15%;
+  text-align: center;
+  color: #6b7280;
+}
+
+.applicantMail-cell {
+  width: 20%;
+  text-align: center;
+  color: #6b7280;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.jobTitle-cell {
+  width: 18%;
+  text-align: center;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.state-cell {
+  width: 14%;
+  text-align: center;
+}
+
 .actions-dropdown {
   position: relative;
   display: flex;
@@ -350,15 +491,15 @@ document.addEventListener('click', (event) => {
 }
 
 .actions-menu {
-  position: absolute;
-  top: 100%;
-  left: 0;
+  position: fixed;
   background: white;
   border: 1px solid #e5e7eb;
   border-radius: 0.375rem;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-  z-index: 50;
+  z-index: 9999;
   min-width: 120px;
+  left: 0;
+  top: 100%;
 }
 
 .action-item {
@@ -426,5 +567,131 @@ document.addEventListener('click', (event) => {
   justify-content: center;
   padding: 1rem;
   border-top: 1px solid #e5e7eb;
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+  .table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .table-scroll-wrapper {
+    min-width: 100%;
+    overflow-x: auto;
+  }
+  
+  .data-table {
+    min-width: 900px;
+    width: max-content;
+  }
+  
+  .data-table th,
+  .data-table td {
+    white-space: nowrap;
+    min-width: 120px;
+  }
+  
+  .row-number-header,
+  .row-number-cell {
+    min-width: 60px;
+    width: 60px;
+  }
+  
+  .applicantFullName-header,
+  .applicantFullName-cell {
+    min-width: 140px;
+    width: 140px;
+  }
+  
+  .applicantMobileNumber-header,
+  .applicantMobileNumber-cell {
+    min-width: 120px;
+    width: 120px;
+  }
+  
+  .applicantMail-header,
+  .applicantMail-cell {
+    min-width: 180px;
+    width: 180px;
+  }
+  
+  .jobTitle-header,
+  .jobTitle-cell {
+    min-width: 140px;
+    width: 140px;
+  }
+  
+  .createDate-header,
+  .createDate-cell {
+    min-width: 120px;
+    width: 120px;
+  }
+  
+  .state-header,
+  .state-cell {
+    min-width: 100px;
+    width: 100px;
+  }
+  
+  .actions-header,
+  .actions-cell {
+    min-width: 80px;
+    width: 80px;
+  }
+}
+
+@media (max-width: 480px) {
+  .data-table {
+    min-width: 800px;
+  }
+  
+  .data-table th,
+  .data-table td {
+    padding: 0.5rem 0.25rem;
+    font-size: 0.75rem;
+  }
+  
+  .applicantFullName-header,
+  .applicantFullName-cell {
+    min-width: 120px;
+    width: 120px;
+  }
+  
+  .applicantMobileNumber-header,
+  .applicantMobileNumber-cell {
+    min-width: 100px;
+    width: 100px;
+  }
+  
+  .applicantMail-header,
+  .applicantMail-cell {
+    min-width: 150px;
+    width: 150px;
+  }
+  
+  .jobTitle-header,
+  .jobTitle-cell {
+    min-width: 120px;
+    width: 120px;
+  }
+  
+  .createDate-header,
+  .createDate-cell {
+    min-width: 100px;
+    width: 100px;
+  }
+  
+  .state-header,
+  .state-cell {
+    min-width: 80px;
+    width: 80px;
+  }
+  
+  .actions-header,
+  .actions-cell {
+    min-width: 70px;
+    width: 70px;
+  }
 }
 </style>
