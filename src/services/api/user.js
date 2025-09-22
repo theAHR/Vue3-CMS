@@ -4,8 +4,16 @@ import { createRestService } from './rest'
 export const userService = {
   ...createRestService(apiClient, 'users'),
 
+  search(params = {}) {
+    return apiClient.get('/api/v1/users', { params })
+  },
+
+  getById(id) {
+    return apiClient.get(`/api/v1/users/${id}`)
+  },
+
   updatePassword(payload) {
-    return apiClient.put('/api/v1/users/change-password', payload)
+    return apiClient.post('/api/v1/users/change-password', payload)
   }
 }
 

@@ -51,6 +51,11 @@
                     {{ item[column.key] }}
                   </span>
                   
+                  <!-- Full Name -->
+                  <span v-else-if="column.key === 'fullName'" class="title-cell">
+                    {{ `${item.name || ''} ${item.lastName || ''}`.trim() }}
+                  </span>
+                  
                   <!-- Date -->
                   <span v-else-if="column.key === 'createDate'" class="date-cell">
                     <FormattedDate :date="item[column.key]" format="date-only" />
@@ -69,6 +74,11 @@
                   <!-- Job Title -->
                   <span v-else-if="column.key === 'jobTitle'" class="title-cell">
                     {{ item.job?.title || 'نامشخص' }}
+                  </span>
+                  
+                  <!-- Role -->
+                  <span v-else-if="column.key === 'role'" class="role-cell">
+                    {{ getRoleName(item.userRole) }}
                   </span>
                   
                   <!-- Actions -->
@@ -137,7 +147,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onUnmounted } from 'vue';
 import Button from './Button.vue';
 import Card from './Card.vue';
 import SearchBar from './SearchBar.vue';
@@ -162,7 +172,7 @@ const props = defineProps({
   loadingMore: { type: Boolean, default: false }
 });
 
-const emit = defineEmits(['add', 'edit', 'details', 'delete', 'search', 'search-input', 'load-more']);
+const emit = defineEmits(['add', 'edit', 'details', 'changePassword', 'delete', 'search', 'search-input', 'load-more']);
 
 const openActionsIndex = ref(null);
 const menuPosition = ref({ top: 0, left: 0 });
@@ -173,10 +183,27 @@ const toggleActions = (index, event) => {
   } else {
     const button = event.target.closest('.actions-trigger');
     const rect = button.getBoundingClientRect();
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    
+    let left = rect.left - 125;
+    let top = rect.top;
+    
+    if (left < 0) {
+      left = rect.right + 5;
+    }
+    
+    if (top + 150 > viewportHeight) {
+      top = viewportHeight - 160;
+    }
+    
+    if (top < 0) {
+      top = 5;
+    }
     
     menuPosition.value = {
-      top: rect.bottom + window.scrollY + 5,
-      left: rect.right + window.scrollX - 120
+      top: top,
+      left: left
     };
     
     openActionsIndex.value = index;
@@ -200,6 +227,17 @@ const handleLoadMore = () => {
   emit('load-more');
 };
 
+const getRoleName = (roleValue) => {
+  const roles = {
+    1: 'منابع انسانی',
+    2: 'کارشناس پشتیبانی',
+    3: 'سرپرست پشتیبانی',
+    4: 'مدیر سیستم',
+    5: 'روابط عمومی'
+  };
+  return roles[roleValue] || 'نامشخص';
+};
+
 const getColumnHeaderClass = (key) => {
   switch (key) {
     case 'title':
@@ -210,6 +248,8 @@ const getColumnHeaderClass = (key) => {
       return 'date-header';
     case 'active':
       return 'status-header';
+    case 'role':
+      return 'role-header';
     case 'actions':
       return 'actions-header';
     case 'applicantFullName':
@@ -237,6 +277,8 @@ const getColumnCellClass = (key) => {
       return 'date-cell';
     case 'active':
       return 'status-cell';
+    case 'role':
+      return 'role-cell';
     case 'actions':
       return 'actions-cell';
     case 'applicantFullName':
@@ -255,10 +297,16 @@ const getColumnCellClass = (key) => {
 };
 
 // Close actions menu when clicking outside
-document.addEventListener('click', (event) => {
+const handleClickOutside = (event) => {
   if (!event.target.closest('.actions-dropdown') && !event.target.closest('.actions-menu')) {
     openActionsIndex.value = null;
   }
+};
+
+document.addEventListener('click', handleClickOutside);
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside);
 });
 </script>
 
@@ -356,6 +404,11 @@ document.addEventListener('click', (event) => {
   text-align: center;
 }
 
+.role-header {
+  width: 18%;
+  text-align: center;
+}
+
 .actions-header {
   width: 20%;
   text-align: center;
@@ -421,6 +474,15 @@ document.addEventListener('click', (event) => {
 .status-cell {
   width: 16%;
   text-align: center;
+}
+
+.role-cell {
+  width: 18%;
+  text-align: center;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .actions-cell {
@@ -498,8 +560,8 @@ document.addEventListener('click', (event) => {
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
   z-index: 9999;
   min-width: 120px;
-  left: 0;
-  top: 100%;
+  max-height: 200px;
+  overflow-y: auto;
 }
 
 .action-item {

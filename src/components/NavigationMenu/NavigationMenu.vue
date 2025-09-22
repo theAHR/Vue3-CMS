@@ -71,10 +71,10 @@
         <div class="avatar-container">
           <img :src="profileImage" class="avatar" alt="مدیر سیستم" />
         </div>
-                  <div class="profile-details">
-            <h3 class="profile-name">{{ PROFILE_DATA.name }}</h3>
-            <p class="profile-role">{{ PROFILE_DATA.role }}</p>
-          </div>
+        <div class="profile-details">
+          <h3 class="profile-name">{{ accountStore.getUserFullName }}</h3>
+          <p class="profile-role">{{ accountStore.getRoleDisplayName }}</p>
+        </div>
       </div>
     </div>
   </aside>
@@ -84,9 +84,11 @@
 import { ref, watch, onMounted, onUnmounted, computed } from "vue"
 import { useRoute } from "vue-router"
 import { useAppStore } from "@/stores/app"
+import { useAccountStore } from "@/stores/account"
+import { getMenuItemsForRole } from "@/utils/roleUtils"
 
 // Assets
-import profileImage from "@/assets/img/img/HajAmir.jpg"
+import profileImage from "@/assets/img/img/profile.png"
 import homeIcon from "@/assets/img/icons/home.svg"
 import newsIcon from "@/assets/img/icons/news.svg"
 import announcementIcon from "@/assets/img/icons/announcement.svg"
@@ -104,11 +106,6 @@ import commentIcon from "@/assets/img/icons/comment.svg"
 import arrowIcon from "@/assets/img/icons/arrow.svg"
 
 // Constants
-const PROFILE_DATA = {
-  name: "حاج امیر",
-  role: "مدیر سیستم"
-}
-
 const MOBILE_BREAKPOINT = 768
 
 // Icons mapping
@@ -197,7 +194,6 @@ const mainMenuItems = [
   { title: "راهنما", to: "/guide", icon: icons.guide },
   { title: "درخواست‌های تماس", to: "/contact-requests", icon: icons.contact },
   { title: "نظرات کاربران", to: "/rate-and-review", icon: icons.comment },
-  { title: "شبکه‌های اجتماعی", to: "/social-networks", icon: icons.social },
 ]
 
 const systemMenuItems = [
@@ -207,8 +203,7 @@ const systemMenuItems = [
     icon: icons.user,
     paths: ["/users", "/roles"],
     children: [
-      { title: "کاربران", to: "/users" },
-      { title: "نقش‌ها", to: "/roles" },
+      { title: "کاربران", to: "/users" }
     ],
   }
 ]
@@ -216,12 +211,25 @@ const systemMenuItems = [
 // Composables
 const route = useRoute()
 const appStore = useAppStore()
+const accountStore = useAccountStore()
 
 // Reactive state
 const openAccordions = ref({})
 
 // Computed properties
-const allMenuItems = computed(() => [...mainMenuItems, ...systemMenuItems])
+const allMenuItems = computed(() => {
+  const userRole = accountStore.getUserRole
+  const allItems = [...mainMenuItems, ...systemMenuItems]
+  
+  if (userRole === 4) {
+    return allItems // Admin sees everything
+  }
+  
+  const filteredMainItems = getMenuItemsForRole(userRole, mainMenuItems)
+  const filteredSystemItems = systemMenuItems.filter(() => userRole === 4)
+  
+  return [...filteredMainItems, ...filteredSystemItems]
+})
 
 // Methods
 const toggleAccordion = (key) => {
@@ -269,8 +277,8 @@ watch(() => route.path, autoOpenAccordions, { immediate: true })
 .sidebar {
   width: 250px;
   height: 100vh;
-  background: rgb(43, 43, 43);
-  color: #fff;
+  background: rgb(44, 44, 44);
+  color: #ffffff;
   display: flex;
   flex-direction: column;
   position: fixed;
@@ -340,20 +348,12 @@ watch(() => route.path, autoOpenAccordions, { immediate: true })
 }
 
 .menu::-webkit-scrollbar {
-  width: 6px;
+  display: none;
 }
 
-.menu::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.menu::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 3px;
-}
-
-.menu::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.3);
+.menu {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 .menu-section {
@@ -367,11 +367,11 @@ watch(() => route.path, autoOpenAccordions, { immediate: true })
   align-items: center;
   padding: 10px 14px;
   gap: 10px;
-  color: #d1d1d6;
+  color: #ffffff;
   text-decoration: none;
   transition: background 0.2s;
   margin-right: 0;
-  font-size: 0.97rem;
+  font-size: 1rem;
   cursor: pointer;
 }
 
@@ -411,7 +411,6 @@ watch(() => route.path, autoOpenAccordions, { immediate: true })
   font-weight: 400;
 }
 
-/* Accordion Styles */
 .accordion-arrow {
   width: 16px;
   height: 16px;
@@ -461,7 +460,7 @@ watch(() => route.path, autoOpenAccordions, { immediate: true })
   align-items: center;
   padding: 12px 36px;
   font-size: 0.92rem;
-  color: #bdbdc2;
+  color: #b3b3b3;
   text-decoration: none;
   transition: background 0.2s;
   gap: 8px;
@@ -479,8 +478,8 @@ watch(() => route.path, autoOpenAccordions, { immediate: true })
 }
 
 .submenu-dot {
-  width: 4px;
-  height: 4px;
+  width: 5px;
+  height: 5px;
   background: currentColor;
   border-radius: 50%;
   opacity: 0.6;

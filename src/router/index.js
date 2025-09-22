@@ -1,5 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
+import { useAccountStore } from '@/stores/account'
+import { getRoutesForRole } from '@/utils/roleUtils'
 
 const routes = [
   {
@@ -127,22 +129,10 @@ const routes = [
         meta: { title: 'نظرات و امتیازات' }
       },
       {
-        path: '/social-networks',
-        component: () => import('@/pages/socialNetwork/index.vue'),
-        name: 'SocialNetwork',
-        meta: { title: 'شبکه‌های اجتماعی' }
-      },
-      {
         path: '/users',
         component: () => import('@/pages/user/index.vue'),
         name: 'کاربران',
         meta: { title: 'لیست کاربران' }
-      },
-      {
-        path: '/roles',
-        component: () => import('@/pages/role/index.vue'),
-        name: 'نقش',
-        meta: { title: 'لیست نقش‌ها' }
       },
       {
         path: '/account/profile',
@@ -171,16 +161,33 @@ router.beforeEach((to, from, next) => {
   const authRequired = !publicPages.includes(to.path)
   
   if (authRequired) {
-    const token = document.cookie.includes('tspadmin.token=')
-    if (!token) {
+    // Check both localStorage and cookies for token
+    const tokenInCookie = document.cookie.includes('tspadmin.token=')
+    const tokenInStorage = localStorage.getItem('tspadmin.token')
+    
+    if (!tokenInCookie && !tokenInStorage) {
       next('/account/auth')
       return
     }
   }
   
   if (to.path === '/account/auth') {
-    const token = document.cookie.includes('tspadmin.token=')
-    if (token) {
+    // Check both localStorage and cookies for token
+    const tokenInCookie = document.cookie.includes('tspadmin.token=')
+    const tokenInStorage = localStorage.getItem('tspadmin.token')
+    
+    if (tokenInCookie || tokenInStorage) {
+      next('/dashboard')
+      return
+    }
+  }
+  
+  if (authRequired) {
+    const accountStore = useAccountStore()
+    const userRole = accountStore.getUserRole
+    const allowedRoutes = getRoutesForRole(userRole)
+    
+    if (!allowedRoutes.includes('all') && !allowedRoutes.some(route => to.path.startsWith(route))) {
       next('/dashboard')
       return
     }

@@ -154,14 +154,14 @@ const messages = ref([
     sender: 'مدیر سیستم',
     preview: 'لطفاً گزارش ماهانه را بررسی کنید',
     time: '10 دقیقه پیش',
-    avatar: '/src/assets/img/img/HajAmir.jpg'
+    avatar: '/src/assets/img/img/profile.png'
   },
   {
     id: 2,
     sender: 'پشتیبانی فنی',
     preview: 'مشکل شما حل شده است',
     time: '1 ساعت پیش',
-    avatar: '/src/assets/img/img/HajAmir.jpg'
+    avatar: '/src/assets/img/img/profile.png'
   }
 ]);
 
