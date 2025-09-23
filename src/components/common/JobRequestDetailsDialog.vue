@@ -94,7 +94,7 @@
               <label class="detail-label">فایل رزومه:</label>
               <div class="detail-value">
                 <a 
-                  :href="`/api/v1/files/${jobRequest.applicantResume}`" 
+                  :href="getResumeUrl(jobRequest.applicantResume)" 
                   target="_blank" 
                   class="resume-link"
                 >
@@ -137,6 +137,11 @@ const emit = defineEmits(['close']);
 
 const closeDialog = () => {
   emit('close');
+};
+
+const getResumeUrl = (fileName) => {
+  if (!fileName) return '#';
+  return `https://apilanding.trustedtsp.ir/files/${fileName}`;
 };
 </script>
 
@@ -259,18 +264,20 @@ const closeDialog = () => {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  color: #2563eb;
+  color: white;
   text-decoration: none;
   font-weight: 500;
   padding: 0.5rem 1rem;
-  border: 1px solid #2563eb;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
   border-radius: 0.375rem;
-  transition: all 0.15s ease-in-out;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
 }
 
 .resume-link:hover {
-  background-color: #2563eb;
-  color: white;
+  background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
 .download-icon {

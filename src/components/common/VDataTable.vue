@@ -53,7 +53,7 @@
                   
                   <!-- Full Name -->
                   <span v-else-if="column.key === 'fullName'" class="title-cell">
-                    {{ `${item.name || ''} ${item.lastName || ''}`.trim() }}
+                    {{ item.fullName || `${item.name || ''} ${item.lastName || ''}`.trim() }}
                   </span>
                   
                   <!-- Date -->
@@ -69,6 +69,13 @@
                   <!-- State -->
                   <span v-else-if="column.key === 'state'" class="status-cell">
                     <StatusBadge :state="item[column.key]" />
+                  </span>
+                  
+                  <!-- Status (for reviews and contact requests) -->
+                  <span v-else-if="column.key === 'status'" class="status-cell">
+                    <span class="status-label" :class="getStatusClass(item[column.key])">
+                      {{ item[column.key] }}
+                    </span>
                   </span>
                   
                   <!-- Job Title -->
@@ -132,7 +139,7 @@
       }"
     >
       <button 
-        v-for="action in actions" 
+        v-for="action in getFilteredActions(items[openActionsIndex])" 
         :key="action.key"
         class="action-item"
         @click="handleAction(action.key, items[openActionsIndex])"
@@ -184,21 +191,16 @@ const toggleActions = (index, event) => {
     const button = event.target.closest('.actions-trigger');
     const rect = button.getBoundingClientRect();
     const viewportWidth = window.innerWidth;
-    const viewportHeight = window.innerHeight;
     
-    let left = rect.left - 125;
-    let top = rect.top;
+    let left = rect.left - 85;
+    let top = rect.bottom - 20;
     
     if (left < 0) {
       left = rect.right + 5;
     }
     
-    if (top + 150 > viewportHeight) {
-      top = viewportHeight - 160;
-    }
-    
-    if (top < 0) {
-      top = 5;
+    if (left + 85 > viewportWidth) {
+      left = viewportWidth - 90;
     }
     
     menuPosition.value = {
@@ -227,6 +229,23 @@ const handleLoadMore = () => {
   emit('load-more');
 };
 
+const getFilteredActions = (item) => {
+  if (!item) return props.actions;
+  
+  return props.actions.filter(action => {
+    if (action.key === 'check') {
+      return item.canCheck === true;
+    }
+    if (action.key === 'confirm') {
+      return item.canConfirm === true;
+    }
+    if (action.key === 'answer') {
+      return item.canAnswer === true;
+    }
+    return true;
+  });
+};
+
 const getRoleName = (roleValue) => {
   const roles = {
     1: 'منابع انسانی',
@@ -236,6 +255,24 @@ const getRoleName = (roleValue) => {
     5: 'روابط عمومی'
   };
   return roles[roleValue] || 'نامشخص';
+};
+
+const getStatusClass = (status) => {
+  switch (status) {
+    case 'تایید شده':
+    case 'بررسی شده':
+      return 'status-confirmed';
+    case 'تایید نشده':
+    case 'بررسی نشده':
+    case 'در انتظار بررسی':
+      return 'status-pending';
+    case 'فعال':
+      return 'status-active';
+    case 'غیرفعال':
+      return 'status-inactive';
+    default:
+      return 'status-default';
+  }
 };
 
 const getColumnHeaderClass = (key) => {
@@ -262,6 +299,8 @@ const getColumnHeaderClass = (key) => {
       return 'jobTitle-header';
     case 'state':
       return 'state-header';
+    case 'status':
+      return 'status-header';
     default:
       return 'default-header';
   }
@@ -291,6 +330,8 @@ const getColumnCellClass = (key) => {
       return 'jobTitle-cell';
     case 'state':
       return 'state-cell';
+    case 'status':
+      return 'status-cell';
     default:
       return 'default-cell';
   }
@@ -410,7 +451,7 @@ onUnmounted(() => {
 }
 
 .actions-header {
-  width: 20%;
+  width: 15%;
   text-align: center;
 }
 
@@ -440,6 +481,11 @@ onUnmounted(() => {
 
 .state-header {
   width: 14%;
+  text-align: center;
+}
+
+.status-header {
+  width: 16%;
   text-align: center;
 }
 
@@ -525,6 +571,51 @@ onUnmounted(() => {
   text-align: center;
 }
 
+.status-cell {
+  width: 16%;
+  text-align: center;
+}
+
+.status-label {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.status-confirmed {
+  background-color: #d1fae5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+
+.status-pending {
+  background-color: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+
+.status-active {
+  background-color: #d1fae5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+
+.status-inactive {
+  background-color: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+.status-default {
+  background-color: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+}
+
 .actions-dropdown {
   position: relative;
   display: flex;
@@ -559,22 +650,22 @@ onUnmounted(() => {
   border-radius: 0.375rem;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
   z-index: 9999;
-  min-width: 120px;
-  max-height: 200px;
+  min-width: 80px;
+  max-height: 150px;
   overflow-y: auto;
 }
 
 .action-item {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 0.75rem;
+  gap: 0.25rem;
+  padding: 0.375rem 0.5rem;
   border: none;
   background: none;
   width: 100%;
   text-align: right;
   cursor: pointer;
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   color: #374151;
 }
 
@@ -583,8 +674,8 @@ onUnmounted(() => {
 }
 
 .action-icon {
-  width: 1rem;
-  height: 1rem;
+  width: 0.875rem;
+  height: 0.875rem;
   color: #6b7280;
 }
 
@@ -696,10 +787,16 @@ onUnmounted(() => {
     width: 100px;
   }
   
+  .status-header,
+  .status-cell {
+    min-width: 100px;
+    width: 100px;
+  }
+  
   .actions-header,
   .actions-cell {
-    min-width: 80px;
-    width: 80px;
+    min-width: 60px;
+    width: 60px;
   }
 }
 
@@ -750,10 +847,16 @@ onUnmounted(() => {
     width: 80px;
   }
   
+  .status-header,
+  .status-cell {
+    min-width: 80px;
+    width: 80px;
+  }
+  
   .actions-header,
   .actions-cell {
-    min-width: 70px;
-    width: 70px;
+    min-width: 50px;
+    width: 50px;
   }
 }
 </style>
