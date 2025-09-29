@@ -16,6 +16,15 @@
       @cancel="showLogoutConfirm = false"
     />
 
+    <!-- Change Password Dialog -->
+    <ChangePasswordDialog
+      :show="showChangePasswordDialog"
+      :user="currentUser"
+      :loading="isChangingPassword"
+      @close="showChangePasswordDialog = false"
+      @submit="handleChangePassword"
+    />
+
     <div class="header-content">
       <!-- Left Section -->
       <div class="header-left">
@@ -28,49 +37,18 @@
 
       <!-- Right Section -->
       <div class="header-right">
-        <!-- Action Buttons -->
-        <div class="header-actions">
-          <!-- Notifications -->
-          <button 
-            class="action-button notification-btn" 
-            @click="toggleNotifications" 
-            :class="{ active: showNotifications }"
-            title="اعلان‌ها"
-          >
-            <svg class="action-icon" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
-            </svg>
-            <span v-if="notificationCount > 0" class="notification-badge">
-              {{ notificationCount }}
-            </span>
-          </button>
-
-          <!-- Messages -->
-          <button 
-            class="action-button message-btn" 
-            @click="toggleMessages" 
-            :class="{ active: showMessages }"
-            title="پیام‌ها"
-          >
-            <svg class="action-icon" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
-            </svg>
-            <span v-if="messageCount > 0" class="message-badge">
-              {{ messageCount }}
-            </span>
-          </button>
-
-          <!-- Profile -->
-          <button 
-            class="action-button profile-btn" 
-            @click="navigateTo('/account/profile')" 
-            title="پروفایل"
-          >
-            <svg class="action-icon" viewBox="0 0 67 67" fill="currentColor">
-              <path fill-rule="evenodd" clip-rule="evenodd" d="M27.6433 66.1886C29.5769 66.4971 31.4675 66.6495 33.3621 66.6495C42.1707 66.6495 50.5181 63.2511 56.8541 56.9151C64.5846 49.1846 67.9831 38.5601 66.2057 27.7041C63.9245 13.9461 52.7217 2.7431 38.9637 0.462097C28.1087 -1.3152 17.4437 2.0832 9.75267 9.8137C2.06517 17.5403 -1.33733 28.1657 0.479267 39.0247C2.76047 52.7397 13.9283 63.9076 27.6433 66.1886ZM14.6233 54.8296C14.3889 54.5952 14.1975 54.4038 13.967 54.2085H14.0022V52.6265C14.0022 46.2124 19.1819 41.0325 25.5572 41.0325H41.0532C47.4673 41.0325 52.6432 46.2513 52.6432 52.6265V54.2476C52.526 54.3648 52.4127 54.4702 52.2955 54.5757C52.1783 54.6851 52.065 54.7905 51.9479 54.9038L51.8307 54.9819C46.6549 59.3881 40.1627 61.8217 33.3227 61.8217C26.4829 61.8217 19.9167 59.3881 14.7757 54.9428L14.6233 54.8296ZM24.553 15.3766C26.7952 12.8258 29.9241 11.4352 33.2835 11.4352L33.3225 11.4742C34.0569 11.4742 34.8303 11.5133 35.5647 11.6695C40.0842 12.5172 43.8342 16.2672 44.6819 20.7867C45.4554 24.9195 44.0647 29.0172 40.9358 31.7597C37.8069 34.4667 33.5178 35.3144 29.4588 34.0019C26.1346 32.9199 23.3924 30.1777 22.3104 26.8535C20.9979 22.7597 21.8108 18.4708 24.553 15.3766Z" fill="currentColor"/>
-            </svg>
-          </button>
-        </div>
+        <!-- Change Password Button -->
+        <button 
+          class="change-password-button" 
+          @click="showChangePasswordDialog = true"
+          :disabled="isChangingPassword"
+          title="تغییر رمز عبور"
+        >
+          <span class="change-password-text">تغییر رمز عبور</span>
+          <svg class="change-password-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+          </svg>
+        </button>
 
         <!-- Logout Button -->
         <button 
@@ -86,115 +64,42 @@
       </div>
     </div>
 
-    <!-- Notifications Panel -->
-    <NotificationsPanel 
-      v-if="showNotifications"
-      :notifications="notifications"
-      @close="showNotifications = false"
-    />
-
-    <!-- Messages Panel -->
-    <MessagesPanel 
-      v-if="showMessages"
-      :messages="messages"
-      @close="showMessages = false"
-    />
   </header>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAppStore } from '@/stores/app';
+import { useAccountStore } from '@/stores/account';
 import ConfirmDialog from '../common/ConfirmDialog.vue';
-import NotificationsPanel from './NotificationsPanel.vue';
-import MessagesPanel from './MessagesPanel.vue';
+import ChangePasswordDialog from '../common/ChangePasswordDialog.vue';
 
 // Composables
 const router = useRouter();
 const appStore = useAppStore();
+const accountStore = useAccountStore();
 
 // Reactive state
-const showNotifications = ref(false);
-const showMessages = ref(false);
 const isLoggingOut = ref(false);
 const showLogoutConfirm = ref(false);
+const showChangePasswordDialog = ref(false);
+const isChangingPassword = ref(false);
 
-// Mock data
-const notificationCount = ref(3);
-const messageCount = ref(2);
-
-const notifications = ref([
-  {
-    id: 1,
-    type: 'info',
-    title: 'خبر جدید',
-    message: 'یک خبر جدید در سیستم ثبت شده است',
-    time: '5 دقیقه پیش'
-  },
-  {
-    id: 2,
-    type: 'warning',
-    title: 'توجه',
-    message: 'لطفاً اطلاعات پروفایل خود را تکمیل کنید',
-    time: '1 ساعت پیش'
-  },
-  {
-    id: 3,
-    type: 'success',
-    title: 'عملیات موفق',
-    message: 'عملیات ذخیره‌سازی با موفقیت انجام شد',
-    time: '2 ساعت پیش'
-  }
-]);
-
-const messages = ref([
-  {
-    id: 1,
-    sender: 'مدیر سیستم',
-    preview: 'لطفاً گزارش ماهانه را بررسی کنید',
-    time: '10 دقیقه پیش',
-    avatar: '/src/assets/img/img/profile.png'
-  },
-  {
-    id: 2,
-    sender: 'پشتیبانی فنی',
-    preview: 'مشکل شما حل شده است',
-    time: '1 ساعت پیش',
-    avatar: '/src/assets/img/img/profile.png'
-  }
-]);
+// Computed
+const currentUser = computed(() => accountStore.user);
 
 // Methods
 const toggleSidebar = () => {
   appStore.toggleMobileSidebar();
 };
 
-const toggleNotifications = () => {
-  showNotifications.value = !showNotifications.value;
-  if (showNotifications.value) {
-    showMessages.value = false;
-  }
-};
 
-const toggleMessages = () => {
-  showMessages.value = !showMessages.value;
-  if (showMessages.value) {
-    showNotifications.value = false;
-  }
-};
-
-const navigateTo = (path) => {
-  router.push(path);
-};
 
 const handleLogoutConfirm = async () => {
   isLoggingOut.value = true;
   
-  const { useAccountStore } = await import('@/stores/account');
   const { useSnackbar } = await import('@/utils/snackbar');
-  
-  const accountStore = useAccountStore();
   const { success } = useSnackbar();
   
   await accountStore.logout();
@@ -205,22 +110,28 @@ const handleLogoutConfirm = async () => {
   showLogoutConfirm.value = false;
 };
 
-// Event handlers
-const handleClickOutside = (event) => {
-  if (!event.target.closest('.header')) {
-    showNotifications.value = false;
-    showMessages.value = false;
+const handleChangePassword = async (data) => {
+  isChangingPassword.value = true;
+  
+  try {
+    const { useSnackbar } = await import('@/utils/snackbar');
+    const { success, error } = useSnackbar();
+    
+    // Call the change password API
+    await accountStore.changePassword(data);
+    success('رمز عبور با موفقیت تغییر کرد');
+    showChangePasswordDialog.value = false;
+  } catch (err) {
+    console.error('Change password error:', err);
+    const { useSnackbar } = await import('@/utils/snackbar');
+    const { error } = useSnackbar();
+    error(err.response?.data?.message || 'خطا در تغییر رمز عبور');
+  } finally {
+    isChangingPassword.value = false;
   }
 };
 
-// Lifecycle
-onMounted(() => {
-  document.addEventListener('click', handleClickOutside);
-});
 
-onUnmounted(() => {
-  document.removeEventListener('click', handleClickOutside);
-});
 </script>
 
 <style scoped>
@@ -287,58 +198,43 @@ onUnmounted(() => {
   gap: 16px;
 }
 
-.header-actions {
+/* Change Password Button */
+.change-password-button {
   display: flex;
   align-items: center;
   gap: 10px;
-}
-
-.action-button {
-  position: relative;
-  width: 42px;
-  height: 42px;
+  padding: 10px 16px;
   border: none;
-  border-radius: 12px;
-  background: #f8f9fa;
-  color: #6c757d;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.action-button:hover {
-  background: #e9ecef;
-  color: #495057;
-  transform: translateY(-2px);
-}
-
-.action-button.active {
-  background: #667eea;
-  color: #ffffff;
-}
-
-.action-icon {
-  width: 20px;
-  height: 20px;
-}
-
-.notification-badge,
-.message-badge {
-  position: absolute;
-  top: -5px;
-  right: -5px;
-  background: #ff6b6b;
+  background: linear-gradient(135deg, #8a8b8b 0%, #6e7070 100%);
   color: white;
-  font-size: 0.7rem;
-  font-weight: 600;
-  padding: 2px 6px;
-  border-radius: 10px;
-  min-width: 18px;
-  text-align: center;
-  line-height: 1;
+  cursor: pointer;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  font-size: 0.9rem;
 }
+
+.change-password-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(104, 104, 104, 0.3);
+}
+
+.change-password-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.change-password-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.change-password-text {
+  font-weight: 500;
+}
+
+
 
 /* Logout Button */
 .logout-button {
@@ -414,6 +310,10 @@ onUnmounted(() => {
   .logout-text {
     display: none;
   }
+  
+  .change-password-text {
+    display: none;
+  }
 }
 
 @media (max-width: 480px) {
@@ -435,9 +335,5 @@ onUnmounted(() => {
     height: 16px;
   }
   
-  .action-button {
-    width: 38px;
-    height: 38px;
-  }
 }
 </style>

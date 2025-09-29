@@ -13,14 +13,16 @@
 
         <div class="dialog-body">
           <div v-if="multimedia" class="multimedia-details">
-            <div class="detail-group">
-              <label class="detail-label">عنوان:</label>
-              <div class="detail-value">{{ multimedia.description }}</div>
-            </div>
+            <div class="details-grid">
+              <div class="detail-group">
+                <label class="detail-label">عنوان:</label>
+                <div class="detail-value">{{ multimedia.description }}</div>
+              </div>
 
-            <div class="detail-group">
-              <label class="detail-label">تاریخ ایجاد:</label>
-              <div class="detail-value">{{ formatDate(multimedia.createDate) }}</div>
+              <div class="detail-group">
+                <label class="detail-label">تاریخ ایجاد:</label>
+                <div class="detail-value">{{ formatDate(multimedia.createDate) }}</div>
+              </div>
             </div>
 
             <div v-if="multimedia.modifyDate" class="detail-group">
@@ -101,6 +103,7 @@
 
 <script setup>
 import { computed } from 'vue';
+import { fileBaseURL, imageBaseURL } from '@/config/api';
 
 const props = defineProps({
   show: { type: Boolean, default: false },
@@ -132,12 +135,12 @@ const formatDate = (dateString) => {
 
 const getVideoUrl = (fileName) => {
   if (!fileName) return '#';
-  return `https://apilanding.trustedtsp.ir/files/${fileName}`;
+  return `${fileBaseURL}${fileName}`;
 };
 
 const getThumbnailUrl = (fileName) => {
   if (!fileName) return '#';
-  return `https://apilanding.trustedtsp.ir/images/${fileName}`;
+  return `${imageBaseURL}${fileName}`;
 };
 </script>
 
@@ -236,6 +239,12 @@ const getThumbnailUrl = (fileName) => {
   gap: 1.5rem;
 }
 
+.details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
 .detail-group {
   display: flex;
   flex-direction: column;
@@ -329,9 +338,8 @@ const getThumbnailUrl = (fileName) => {
 }
 
 .download-btn:hover {
-  background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 4px 12px rgba(129, 129, 129, 0.3);
 }
 
 .download-btn svg {
@@ -400,6 +408,11 @@ const getThumbnailUrl = (fileName) => {
   .download-btn {
     width: 100%;
     justify-content: center;
+  }
+
+  .details-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
   }
 }
 

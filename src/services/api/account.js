@@ -38,6 +38,10 @@ export const accountService = {
 
   updateProfile(payload) {
     return apiClient.put('/api/v1/users/profile', payload)
+  },
+
+  changePassword(payload) {
+    return apiClient.post('/api/v1/users/change-password', payload)
   }
 }
 

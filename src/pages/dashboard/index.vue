@@ -197,18 +197,18 @@ function createContentPieChart() {
           contentData.jobs
         ],
         backgroundColor: [
-          '#3B82F6',
-          '#10B981',
-          '#F59E0B',
-          '#EF4444',
-          '#8B5CF6'
+          '#4F46E5', // Indigo - سوالات متداول
+          '#059669', // Emerald - مجلات
+          '#D97706', // Amber - راهنماها
+          '#DC2626', // Red - چندرسانه‌ای
+          '#7C3AED'  // Violet - شغل‌ها
         ],
         borderColor: [
-          '#2563EB',
-          '#059669',
-          '#D97706',
-          '#DC2626',
-          '#7C3AED'
+          '#3730A3', // Darker Indigo
+          '#047857', // Darker Emerald
+          '#B45309', // Darker Amber
+          '#B91C1C', // Darker Red
+          '#6D28D9'  // Darker Violet
         ],
         borderRadius: 6,
         borderSkipped: false
@@ -273,8 +273,8 @@ function createRequestsDoughnutChart() {
           requestStats.contactRequests.unchecked + requestStats.jobRequests.unchecked + requestStats.reviews.unchecked
         ],
         backgroundColor: [
-          '#10B981',
-          '#F59E0B'
+          '#059669', // Emerald - بررسی شده
+          '#D97706'  // Amber - در انتظار بررسی
         ],
         borderWidth: 2,
         borderColor: '#ffffff'
@@ -325,10 +325,10 @@ function createMagazineDonutChart() {
           magazineData.type4
         ],
         backgroundColor: [
-          '#3B82F6',
-          '#10B981',
-          '#F59E0B',
-          '#EF4444'
+          '#4F46E5', // Indigo - خبر
+          '#059669', // Emerald - اطلاعیه
+          '#D97706', // Amber - بخشنامه
+          '#DC2626'  // Red - دستورالعمل
         ],
         borderWidth: 2,
         borderColor: '#ffffff'

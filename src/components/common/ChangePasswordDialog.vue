@@ -23,15 +23,36 @@
                 رمز عبور جدید
                 <span class="required">*</span>
               </label>
-              <input
-                id="newPassword"
-                v-model="formData.newPassword"
-                type="password"
-                class="form-input"
-                :class="{ 'error': errors.newPassword }"
-                placeholder="رمز عبور جدید را وارد کنید ..."
-                @input="clearError('newPassword')"
-              />
+              <div class="password-input-container">
+                <input
+                  id="newPassword"
+                  v-model="formData.newPassword"
+                  :type="showNewPassword ? 'text' : 'password'"
+                  class="form-input"
+                  :class="{ 'error': errors.newPassword }"
+                  placeholder="رمز عبور جدید را وارد کنید ..."
+                  @input="clearError('newPassword')"
+                />
+                <button
+                  type="button"
+                  class="password-toggle"
+                  @click="toggleNewPassword"
+                  :aria-label="showNewPassword ? 'مخفی کردن رمز عبور' : 'نمایش رمز عبور'"
+                >
+                  <img
+                    v-if="showNewPassword"
+                    src="@/assets/img/icons/eye-close.svg"
+                    alt="مخفی کردن"
+                    class="eye-icon"
+                  />
+                  <img
+                    v-else
+                    src="@/assets/img/icons/eye-open.svg"
+                    alt="نمایش"
+                    class="eye-icon"
+                  />
+                </button>
+              </div>
               <div v-if="errors.newPassword" class="error-notification">
                 <svg class="error-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -45,15 +66,36 @@
                 تأیید رمز عبور
                 <span class="required">*</span>
               </label>
-              <input
-                id="confirmPassword"
-                v-model="formData.confirmPassword"
-                type="password"
-                class="form-input"
-                :class="{ 'error': errors.confirmPassword }"
-                placeholder="رمز عبور را مجدداً وارد کنید ..."
-                @input="clearError('confirmPassword')"
-              />
+              <div class="password-input-container">
+                <input
+                  id="confirmPassword"
+                  v-model="formData.confirmPassword"
+                  :type="showConfirmPassword ? 'text' : 'password'"
+                  class="form-input"
+                  :class="{ 'error': errors.confirmPassword }"
+                  placeholder="رمز عبور را مجدداً وارد کنید ..."
+                  @input="clearError('confirmPassword')"
+                />
+                <button
+                  type="button"
+                  class="password-toggle"
+                  @click="toggleConfirmPassword"
+                  :aria-label="showConfirmPassword ? 'مخفی کردن رمز عبور' : 'نمایش رمز عبور'"
+                >
+                  <img
+                    v-if="showConfirmPassword"
+                    src="@/assets/img/icons/eye-close.svg"
+                    alt="مخفی کردن"
+                    class="eye-icon"
+                  />
+                  <img
+                    v-else
+                    src="@/assets/img/icons/eye-open.svg"
+                    alt="نمایش"
+                    class="eye-icon"
+                  />
+                </button>
+              </div>
               <div v-if="errors.confirmPassword" class="error-notification">
                 <svg class="error-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -116,6 +158,9 @@ const formData = ref({
 
 const errors = ref({});
 
+const showNewPassword = ref(false);
+const showConfirmPassword = ref(false);
+
 const validateForm = () => {
   errors.value = {};
   
@@ -153,12 +198,22 @@ const clearError = (field) => {
   }
 };
 
+const toggleNewPassword = () => {
+  showNewPassword.value = !showNewPassword.value;
+};
+
+const toggleConfirmPassword = () => {
+  showConfirmPassword.value = !showConfirmPassword.value;
+};
+
 const resetForm = () => {
   formData.value = {
     newPassword: '',
     confirmPassword: ''
   };
   errors.value = {};
+  showNewPassword.value = false;
+  showConfirmPassword.value = false;
 };
 
 const closeDialog = () => {
@@ -469,5 +524,38 @@ onMounted(() => {
 .loading-form {
   opacity: 0.5;
   pointer-events: none;
+}
+
+.password-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-toggle {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 20px;
+}
+
+.eye-icon {
+  width: 20px;
+  height: 20px;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.eye-icon:hover {
+  opacity: 1;
 }
 </style>

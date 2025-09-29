@@ -13,19 +13,16 @@
 
         <div class="dialog-body">
           <div v-if="guide" class="guide-details">
-            <div class="detail-group">
-              <label class="detail-label">عنوان:</label>
-              <div class="detail-value">{{ guide.title }}</div>
-            </div>
-
-            <div class="detail-group">
-              <label class="detail-label">نام فایل:</label>
-              <div class="detail-value">{{ guide.fileName }}</div>
-            </div>
-
-            <div class="detail-group">
-              <label class="detail-label">تاریخ ایجاد:</label>
-              <div class="detail-value">{{ formatDate(guide.createDate) }}</div>
+            <div class="details-grid">
+              <div class="detail-group">
+                <label class="detail-label">عنوان:</label>
+                <div class="detail-value">{{ guide.title }}</div>
+              </div>
+              
+              <div class="detail-group">
+                <label class="detail-label">تاریخ ایجاد:</label>
+                <div class="detail-value">{{ formatDate(guide.createDate) }}</div>
+              </div>
             </div>
 
             <div v-if="guide.modifyDate" class="detail-group">
@@ -78,6 +75,7 @@
 
 <script setup>
 import { computed } from 'vue';
+import { fileBaseURL } from '@/config/api';
 
 const props = defineProps({
   show: { type: Boolean, default: false },
@@ -109,7 +107,7 @@ const formatDate = (dateString) => {
 
 const getFileUrl = (fileName) => {
   if (!fileName) return '#';
-  return `https://apilanding.trustedtsp.ir/files/${fileName}`;
+  return `${fileBaseURL}${fileName}`;
 };
 </script>
 
@@ -208,6 +206,12 @@ const getFileUrl = (fileName) => {
   gap: 1.5rem;
 }
 
+.details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
 .detail-group {
   display: flex;
   flex-direction: column;
@@ -276,7 +280,7 @@ const getFileUrl = (fileName) => {
 }
 
 .download-btn {
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  background: linear-gradient(135deg, #9a9b9c 0%, #575757 100%);
   color: white;
   text-decoration: none;
   padding: 0.5rem 1rem;
@@ -291,9 +295,8 @@ const getFileUrl = (fileName) => {
 }
 
 .download-btn:hover {
-  background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 4px 12px rgba(112, 112, 112, 0.3);
 }
 
 .download-btn svg {
@@ -362,6 +365,11 @@ const getFileUrl = (fileName) => {
   .download-btn {
     width: 100%;
     justify-content: center;
+  }
+
+  .details-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
   }
 }
 

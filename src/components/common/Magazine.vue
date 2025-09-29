@@ -83,7 +83,7 @@ const getMagazineTypeTitle = (type) => {
     3: 'بخشنامه',
     4: 'راهنما'
   };
-  return titles[type] || 'مجله';
+  return titles[type] || 'محتوا';
 };
 
 const addButtonText = computed(() => {
@@ -134,7 +134,7 @@ const handleLoadMore = async () => {
   try {
     await magazineStore.loadMoreMagazines(props.magazineType);
   } catch (err) {
-    error('خطا در دریافت مجله‌های بیشتر');
+    error('خطا در دریافت محتوا‌های بیشتر');
   }
 };
 
@@ -161,10 +161,10 @@ const handleDelete = (magazine) => {
 const confirmDelete = async () => {
   try {
     await magazineStore.deleteMagazine(magazineToDelete.value.id, props.magazineType);
-    success('مجله با موفقیت حذف شد');
+    success('محتوا با موفقیت حذف شد');
     magazineStore.closeDeleteConfirm();
   } catch (err) {
-    error('خطا در حذف مجله');
+    error('خطا در حذف محتوا');
   }
 };
 
@@ -174,7 +174,7 @@ const handleSearch = async (query) => {
   try {
     await magazineStore.searchMagazines(props.magazineType);
   } catch (err) {
-    error('خطا در جستجوی مجله‌ها');
+    error('خطا در جستجوی محتوا');
   }
 };
 
@@ -193,12 +193,12 @@ const handleSubmit = async (formData) => {
     
     if (response.data.success) {
       magazineStore.closeDialog();
-      success(formData.id ? 'مجله با موفقیت ویرایش شد' : 'مجله با موفقیت ایجاد شد');
+      success(formData.id ? 'محتوا با موفقیت ویرایش شد' : 'محتوا با موفقیت ایجاد شد');
     } else {
-      error('خطا در ذخیره مجله: ' + (response.data.message || 'خطای نامشخص'));
+      error('خطا در ذخیره محتوا: ' + (response.data.message || 'خطای نامشخص'));
     }
   } catch (err) {
-    error('خطا در ذخیره مجله');
+    error('خطا در ذخیره محتوا');
   }
 };
 
@@ -212,7 +212,7 @@ onMounted(async () => {
   try {
     await magazineStore.searchMagazines(props.magazineType);
   } catch (err) {
-    error('خطا در دریافت مجله‌ها');
+    error('خطا در دریافت محتوا‌ها');
   }
 });
 </script>

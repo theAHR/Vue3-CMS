@@ -12,49 +12,49 @@
         </div>
 
         <div class="dialog-body">
-          <div v-if="job" class="details-content">
-            <div class="detail-section">
-              <h4 class="section-title">اطلاعات کلی</h4>
-              <div class="detail-grid">
-                <div class="detail-item">
-                  <label class="detail-label">عنوان:</label>
-                  <span class="detail-value">{{ job.title }}</span>
-                </div>
-                <div class="detail-item">
-                  <label class="detail-label">وضعیت:</label>
+          <div v-if="job" class="job-details">
+            <div class="detail-group">
+              <label class="detail-label">عنوان:</label>
+              <div class="detail-value">{{ job.title }}</div>
+            </div>
+
+            <div class="details-grid">
+              <div class="detail-group">
+                <label class="detail-label">وضعیت:</label>
+                <div class="detail-value">
                   <StatusBadge :status="job.active" :active-text="'فعال'" :inactive-text="'غیرفعال'" />
                 </div>
-                <div class="detail-item">
-                  <label class="detail-label">تاریخ ایجاد:</label>
+              </div>
+
+              <div class="detail-group">
+                <label class="detail-label">بخش سازمانی:</label>
+                <div class="detail-value">{{ getJobSectionName(job.jobSectionId) }}</div>
+              </div>
+
+              <div class="detail-group">
+                <label class="detail-label">تاریخ ایجاد:</label>
+                <div class="detail-value">
                   <FormattedDate :date="job.createDate" />
                 </div>
-                <div class="detail-item">
-                  <label class="detail-label">تاریخ ویرایش:</label>
+              </div>
+
+              <div class="detail-group">
+                <label class="detail-label">تاریخ ویرایش:</label>
+                <div class="detail-value">
                   <FormattedDate v-if="job.modifyDate" :date="job.modifyDate" />
-                  <span v-else class="detail-value">-</span>
+                  <span v-else>-</span>
                 </div>
               </div>
             </div>
 
-            <div class="detail-section">
-              <h4 class="section-title">توضیحات</h4>
-              <div class="detail-text">
-                {{ job.description }}
-              </div>
+            <div class="detail-group">
+              <label class="detail-label">توضیحات:</label>
+              <div class="detail-value">{{ job.description }}</div>
             </div>
 
-            <div class="detail-section">
-              <h4 class="section-title">نیازمندی‌ها</h4>
-              <div class="detail-text">
-                {{ job.requirement }}
-              </div>
-            </div>
-
-            <div class="detail-section">
-              <h4 class="section-title">بخش سازمانی</h4>
-              <div class="detail-item">
-                <span class="detail-value">{{ getJobSectionName(job.jobSectionId) }}</span>
-              </div>
+            <div class="detail-group">
+              <label class="detail-label">نیازمندی‌ها:</label>
+              <div class="detail-value">{{ job.requirement }}</div>
             </div>
           </div>
         </div>
@@ -167,61 +167,39 @@ const closeDialog = () => {
   max-height: calc(90vh - 140px);
 }
 
-.details-content {
+.job-details {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
 }
 
-.detail-section {
-  background: #f9fafb;
-  border-radius: 0.5rem;
-  padding: 1.5rem;
-  border: 1px solid #e5e7eb;
-}
-
-.section-title {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #374151;
-  margin: 0 0 1rem 0;
-  padding-bottom: 0.5rem;
-  border-bottom: 2px solid #e5e7eb;
-}
-
-.detail-grid {
+.details-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1rem;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
 }
 
-.detail-item {
+.detail-group {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.5rem;
 }
 
 .detail-label {
   font-size: 0.875rem;
-  font-weight: 500;
-  color: #6b7280;
+  font-weight: 600;
+  color: #374151;
+  margin: 0;
 }
 
 .detail-value {
   font-size: 0.875rem;
-  color: #374151;
-  font-weight: 500;
-}
-
-.detail-text {
-  font-size: 0.875rem;
-  color: #374151;
-  line-height: 1.6;
-  background: white;
-  padding: 1rem;
+  color: #6b7280;
+  padding: 0.75rem;
+  background-color: #f9fafb;
   border-radius: 0.375rem;
   border: 1px solid #e5e7eb;
-  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 .dialog-footer {
@@ -252,7 +230,8 @@ const closeDialog = () => {
 }
 
 .btn-close:hover {
-  background: #525252;
+  background: #4a4a4a;
+  transform: translateY(-1px);
 }
 
 .dialog-header {
@@ -275,12 +254,13 @@ const closeDialog = () => {
     padding: 1rem;
   }
   
-  .detail-grid {
-    grid-template-columns: 1fr;
+  .detail-group {
+    gap: 0.25rem;
   }
-  
-  .detail-section {
-    padding: 1rem;
+
+  .details-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
   }
 }
 

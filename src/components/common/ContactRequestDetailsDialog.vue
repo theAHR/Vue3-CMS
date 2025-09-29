@@ -13,62 +13,33 @@
 
         <div class="dialog-body">
           <div v-if="contactRequest" class="contact-request-details">
-            <div class="detail-section">
-              <h4 class="section-title">اطلاعات متقاضی</h4>
-              
-              <div class="detail-item">
-                <label class="detail-label">نام:</label>
-                <span class="detail-value">{{ contactRequest.name || 'نامشخص' }}</span>
-              </div>
-              
-              <div class="detail-item">
-                <label class="detail-label">نام خانوادگی:</label>
-                <span class="detail-value">{{ contactRequest.lastName || 'نامشخص' }}</span>
-              </div>
-              
-              <div class="detail-item">
+            <div class="details-grid">
+              <div class="detail-group">
                 <label class="detail-label">نام کامل:</label>
-                <span class="detail-value">{{ getFullName() }}</span>
+                <div class="detail-value">{{ getFullName() }}</div>
               </div>
-              
-              <div class="detail-item">
-                <label class="detail-label">شماره موبایل:</label>
-                <span class="detail-value">{{ contactRequest.mobileNo || 'نامشخص' }}</span>
-              </div>
-              
-              <div class="detail-item">
-                <label class="detail-label">ایمیل:</label>
-                <span class="detail-value">{{ contactRequest.email || 'نامشخص' }}</span>
-              </div>
-            </div>
 
-            <div class="detail-section">
-              <h4 class="section-title">پیام</h4>
-              
-              <div class="detail-item">
-                <label class="detail-label">توضیحات:</label>
-                <div class="detail-value description-text">
-                  {{ contactRequest.description || 'توضیحی ارائه نشده' }}
+              <div class="detail-group">
+                <label class="detail-label">شماره موبایل:</label>
+                <div class="detail-value">{{ contactRequest.mobileNo || 'نامشخص' }}</div>
+              </div>
+
+              <div class="detail-group">
+                <label class="detail-label">ایمیل:</label>
+                <div class="detail-value">{{ contactRequest.email || 'نامشخص' }}</div>
+              </div>
+
+              <div class="detail-group">
+                <label class="detail-label">تاریخ ایجاد:</label>
+                <div class="detail-value">
+                  <FormattedDate :date="contactRequest.createDate" format="full" />
                 </div>
               </div>
             </div>
 
-            <div class="detail-section">
-              <h4 class="section-title">اطلاعات درخواست</h4>
-              
-              <div class="detail-item">
-                <label class="detail-label">وضعیت:</label>
-                <span class="detail-value">
-                  <StatusBadge :state="contactRequest.isCheck ? 'checked' : 'pending'" />
-                </span>
-              </div>
-              
-              <div class="detail-item">
-                <label class="detail-label">تاریخ ایجاد:</label>
-                <span class="detail-value">
-                  <FormattedDate :date="contactRequest.createDate" format="full" />
-                </span>
-              </div>
+            <div class="detail-group">
+              <label class="detail-label">توضیحات:</label>
+              <div class="detail-value">{{ contactRequest.description || 'توضیحی ارائه نشده' }}</div>
             </div>
           </div>
         </div>
@@ -205,48 +176,33 @@ const getFullName = () => {
   gap: 1.5rem;
 }
 
-.detail-section {
-  margin-bottom: 1.5rem;
+.details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
 }
 
-.section-title {
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: #374151;
-  margin: 0 0 1rem 0;
-  padding-bottom: 0.5rem;
-  border-bottom: 2px solid #e5e7eb;
-}
-
-.detail-item {
+.detail-group {
   display: flex;
-  margin-bottom: 1rem;
-  padding: 0.75rem;
-  background-color: #f9fafb;
-  border-radius: 0.375rem;
-  transition: background-color 0.15s ease-in-out;
-}
-
-.detail-item:hover {
-  background-color: #f3f4f6;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .detail-label {
+  font-size: 0.875rem;
   font-weight: 600;
   color: #374151;
-  min-width: 140px;
-  margin-right: 0;
-  margin-left: 1rem;
+  margin: 0;
 }
 
 .detail-value {
+  font-size: 0.875rem;
   color: #6b7280;
-  flex: 1;
-}
-
-.description-text {
-  white-space: pre-wrap;
-  line-height: 1.6;
+  padding: 0.75rem;
+  background-color: #f9fafb;
+  border-radius: 0.375rem;
+  border: 1px solid #e5e7eb;
+  word-break: break-word;
 }
 
 .dialog-footer {
@@ -271,22 +227,17 @@ const getFullName = () => {
 }
 
 .btn-close {
-  background: #f1f5f9;
-  color: #565758;
+  background: #636363;
+  color: #ffffff;
 }
 
-.btn-close:hover:not(:disabled) {
-  background: #e2e8f0;
-  color: #475569;
+.btn-close:hover {
+  background: #4a4a4a;
   transform: translateY(-1px);
 }
 
 .dialog-header {
   flex-direction: row-reverse;
-}
-
-.detail-item {
-  flex-direction: row;
 }
 
 .dialog-footer {
@@ -305,13 +256,13 @@ const getFullName = () => {
     padding: 1rem;
   }
   
-  .detail-item {
-    flex-direction: column;
+  .detail-group {
+    gap: 0.25rem;
   }
-  
-  .detail-label {
-    margin-right: 0;
-    margin-bottom: 0.5rem;
+
+  .details-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
   }
 }
 

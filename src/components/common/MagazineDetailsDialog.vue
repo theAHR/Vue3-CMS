@@ -14,43 +14,42 @@
 
         <!-- Dialog Body -->
         <div class="dialog-body">
-          <div v-if="fullMagazineData">
-            <div class="detail-item">
-              <label class="detail-label">عنوان:</label>
-              <span class="detail-value">{{ fullMagazineData.title || 'نامشخص' }}</span>
+          <div v-if="fullMagazineData" class="magazine-details">
+            <div class="details-grid">
+              <div class="detail-group">
+                <label class="detail-label">عنوان:</label>
+                <div class="detail-value">{{ fullMagazineData.title || 'نامشخص' }}</div>
+              </div>
+
+              <div class="detail-group">
+                <label class="detail-label">وضعیت:</label>
+                <div class="detail-value">
+                  <span 
+                    :class="fullMagazineData.active ? 'status-active' : 'status-inactive'"
+                    class="status-badge"
+                  >
+                    {{ fullMagazineData.active ? 'فعال' : 'غیرفعال' }}
+                  </span>
+                </div>
+              </div>
+
+              <div class="detail-group">
+                <label class="detail-label">دسته‌بندی:</label>
+                <div class="detail-value">{{ categoryTitle || 'نامشخص' }}</div>
+              </div>
+
+              <div class="detail-group">
+                <label class="detail-label">تاریخ ایجاد:</label>
+                <div class="detail-value">{{ formattedDate || 'نامشخص' }}</div>
+              </div>
             </div>
 
-            <div class="detail-item">
-              <label class="detail-label">وضعیت:</label>
-              <span 
-                :class="fullMagazineData.active ? 'status-active' : 'status-inactive'"
-                class="detail-value status-badge"
-              >
-                {{ fullMagazineData.active ? 'فعال' : 'غیرفعال' }}
-              </span>
-            </div>
-
-            <div class="detail-item">
-              <label class="detail-label">دسته‌بندی:</label>
-              <span class="detail-value">{{ categoryTitle || 'نامشخص' }}</span>
-            </div>
-
-            <div class="detail-item">
-              <label class="detail-label">تاریخ ایجاد:</label>
-              <span class="detail-value">{{ formattedDate || 'نامشخص' }}</span>
-            </div>
-
-            <div class="detail-item">
-              <label class="detail-label">شناسه:</label>
-              <span class="detail-value">{{ fullMagazineData.id || 'نامشخص' }}</span>
-            </div>
-
-            <div class="detail-item detail-item-full">
+            <div class="detail-group">
               <label class="detail-label">متن خبر:</label>
-              <div class="detail-value detail-text">{{ fullMagazineData.text || 'بدون متن' }}</div>
+              <div class="detail-value">{{ fullMagazineData.text || 'بدون متن' }}</div>
             </div>
 
-            <div v-if="fullMagazineData.image && fullMagazineData.image.length > 0" class="detail-item detail-item-full">
+            <div v-if="fullMagazineData.image && fullMagazineData.image.length > 0" class="detail-group">
               <label class="detail-label">تصاویر:</label>
               <div class="images-grid">
                 <div 
@@ -114,6 +113,7 @@
 import { ref, computed, watch } from 'vue';
 import { magazineCategoryService } from '@/services/api/magazineCategory';
 import { magazineService } from '@/services/api/magazine';
+import { imageBaseURL } from '@/config/api';
 
 const props = defineProps({
   show: { type: Boolean, default: false },
@@ -135,7 +135,7 @@ const getMagazineTypeTitle = (type) => {
     3: 'بخشنامه',
     4: 'راهنما'
   };
-  return titles[type] || 'مجله';
+  return titles[type] || 'محتوا';
 };
 
 const dialogTitle = computed(() => {
@@ -151,7 +151,7 @@ const formattedDate = computed(() => {
 
 const getImageUrl = (imageName) => {
   if (!imageName) return '';
-  return `https://apilanding.trustedtsp.ir/images/${imageName}`;
+  return `${imageBaseURL}${imageName}`;
 };
 
 const viewImageFullscreen = (imageUrl) => {
@@ -286,50 +286,62 @@ watch(() => fullMagazineData.value, (newVal) => {
 
 .dialog-body {
   padding: 1.5rem;
-  overflow: hidden;
+  overflow-y: auto;
   flex: 1;
+  max-height: calc(90vh - 160px);
 }
 
-.detail-item {
+.dialog-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dialog-body::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.dialog-body::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.dialog-body::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.magazine-details {
   display: flex;
-  margin-bottom: 1rem;
-  padding: 0.75rem;
-  background-color: #f9fafb;
-  border-radius: 0.375rem;
-  transition: background-color 0.15s ease-in-out;
-}
-
-.detail-item:hover {
-  background-color: #f3f4f6;
-}
-
-.detail-item-full {
   flex-direction: column;
+  gap: 1.5rem;
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.detail-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .detail-label {
+  font-size: 0.875rem;
   font-weight: 600;
   color: #374151;
-  min-width: 120px;
-  margin-right: 0;
-  margin-left: 1rem;
-}
-
-.detail-item-full .detail-label {
-  margin-left: 0;
-  margin-bottom: 0.5rem;
+  margin: 0;
 }
 
 .detail-value {
+  font-size: 0.875rem;
   color: #6b7280;
-  flex: 1;
-}
-
-.detail-text {
-  white-space: pre-wrap;
-  line-height: 1.6;
-  max-height: 200px;
-  overflow-y: auto;
+  padding: 0.75rem;
+  background-color: #f9fafb;
+  border-radius: 0.375rem;
+  border: 1px solid #e5e7eb;
+  word-break: break-word;
 }
 
 .status-badge {
@@ -390,12 +402,7 @@ watch(() => fullMagazineData.value, (newVal) => {
   transition: background 0.15s ease-in-out;
 }
 
-.image-item:hover .image-overlay {
-  background: rgba(0, 0, 0, 0.3);
-}
-
 .view-image-btn {
-  background: rgba(0, 0, 0, 0.5);
   color: white;
   border: none;
   border-radius: 50%;
@@ -435,19 +442,13 @@ watch(() => fullMagazineData.value, (newVal) => {
 }
 
 .btn-close {
-  background: #f1f5f9;
-  color: #64748b;
+  background: #636363;
+  color: #ffffff;
 }
 
 .btn-close:hover:not(:disabled) {
-  background: #e2e8f0;
-  color: #475569;
+  background: #4a4a4a;
   transform: translateY(-1px);
-}
-
-.btn-close:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
 }
 
 .fullscreen-image-overlay {
@@ -506,14 +507,6 @@ watch(() => fullMagazineData.value, (newVal) => {
   flex-direction: row-reverse;
 }
 
-.detail-item {
-  flex-direction: row;
-}
-
-.detail-item-full {
-  flex-direction: column;
-}
-
 .dialog-actions {
   flex-direction: row-reverse;
 }
@@ -531,13 +524,13 @@ watch(() => fullMagazineData.value, (newVal) => {
     padding: 1rem;
   }
   
-  .detail-item {
-    flex-direction: column;
+  .detail-group {
+    gap: 0.25rem;
   }
-  
-  .detail-label {
-    margin-right: 0;
-    margin-bottom: 0.5rem;
+
+  .details-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
   }
 
   .images-grid {

@@ -14,16 +14,18 @@
 
         <!-- Dialog Body -->
         <div class="dialog-body">
-          <div class="detail-item">
-            <label class="detail-label">عنوان:</label>
-            <span class="detail-value">{{ category?.title || 'نامشخص' }}</span>
-          </div>
-          
-          <div class="detail-item">
-            <label class="detail-label">تاریخ ایجاد:</label>
-            <span class="detail-value">
-              <FormattedDate :date="category?.createDate" format="full" />
-            </span>
+          <div class="category-details">
+            <div class="detail-group">
+              <label class="detail-label">عنوان:</label>
+              <div class="detail-value">{{ category?.title || 'نامشخص' }}</div>
+            </div>
+            
+            <div class="detail-group">
+              <label class="detail-label">تاریخ ایجاد:</label>
+              <div class="detail-value">
+                <FormattedDate :date="category?.createDate" format="full" />
+              </div>
+            </div>
           </div>
         </div>
 
@@ -141,34 +143,56 @@ const closeDialog = () => {
 
 .dialog-body {
   padding: 1.5rem;
-  overflow: hidden;
+  overflow-y: auto;
   flex: 1;
+  max-height: calc(90vh - 160px);
 }
 
-.detail-item {
+.dialog-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dialog-body::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.dialog-body::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.dialog-body::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.category-details {
   display: flex;
-  margin-bottom: 1rem;
-  padding: 0.75rem;
-  background-color: #f9fafb;
-  border-radius: 0.375rem;
-  transition: background-color 0.15s ease-in-out;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
-.detail-item:hover {
-  background-color: #f3f4f6;
+.detail-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .detail-label {
+  font-size: 0.875rem;
   font-weight: 600;
   color: #374151;
-  min-width: 120px;
-  margin-right: 0;
-  margin-left: 1rem;
+  margin: 0;
 }
 
 .detail-value {
+  font-size: 0.875rem;
   color: #6b7280;
-  flex: 1;
+  padding: 0.75rem;
+  background-color: #f9fafb;
+  border-radius: 0.375rem;
+  border: 1px solid #e5e7eb;
+  word-break: break-word;
 }
 
 .dialog-actions {
@@ -193,13 +217,12 @@ const closeDialog = () => {
 }
 
 .btn-close {
-  background: #f1f5f9;
-  color: #565758;
+  background: #636363;
+  color: #ffffff;
 }
 
 .btn-close:hover:not(:disabled) {
-  background: #e2e8f0;
-  color: #475569;
+  background: #4a4a4a;
   transform: translateY(-1px);
 }
 
@@ -224,10 +247,6 @@ const closeDialog = () => {
   flex-direction: row-reverse;
 }
 
-.detail-item {
-  flex-direction: row;
-}
-
 .dialog-actions {
   flex-direction: row-reverse;
 }
@@ -245,13 +264,8 @@ const closeDialog = () => {
     padding: 1rem;
   }
   
-  .detail-item {
-    flex-direction: column;
-  }
-  
-  .detail-label {
-    margin-right: 0;
-    margin-bottom: 0.5rem;
+  .detail-group {
+    gap: 0.25rem;
   }
 }
 

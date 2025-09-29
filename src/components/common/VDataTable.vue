@@ -39,7 +39,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(item, index) in items" :key="item.id || index" class="table-row">
+              <tr v-for="(item, index) in items" :key="item.id || index" :class="['table-row', getRowClass(index)]">
                 <td v-for="column in columns" :key="column.key" :class="[column.class, getColumnCellClass(column.key)]">
                   <!-- Row Number -->
                   <span v-if="column.key === 'rowNumber'">
@@ -337,6 +337,10 @@ const getColumnCellClass = (key) => {
   }
 };
 
+const getRowClass = (index) => {
+  return index % 2 === 0 ? 'row-even' : 'row-odd';
+};
+
 // Close actions menu when clicking outside
 const handleClickOutside = (event) => {
   if (!event.target.closest('.actions-dropdown') && !event.target.closest('.actions-menu')) {
@@ -494,6 +498,23 @@ onUnmounted(() => {
   border-bottom: 1px solid #f3f4f6;
   color: #374151;
   font-size: 0.8rem;
+}
+
+/* Alternating row colors */
+.row-even {
+  background-color: #ffffff;
+}
+
+.row-odd {
+  background-color: #f8fafc;
+}
+
+.row-even:hover {
+  background-color: #f1f5f9;
+}
+
+.row-odd:hover {
+  background-color: #e2e8f0;
 }
 
 /* Column cell widths */

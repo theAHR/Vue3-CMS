@@ -13,85 +13,65 @@
 
         <div class="dialog-body">
           <div v-if="review" class="review-details">
-            <div class="detail-section">
-              <h4 class="section-title">اطلاعات کاربر</h4>
-              
-              <div class="detail-item">
-                <label class="detail-label">نام کامل:</label>
-                <span class="detail-value">{{ review.fullname || 'نامشخص' }}</span>
-              </div>
-              
-              <div class="detail-item">
-                <label class="detail-label">شماره موبایل:</label>
-                <span class="detail-value">{{ review.mobile || 'نامشخص' }}</span>
-              </div>
+            <div class="detail-group">
+              <label class="detail-label">نام کامل:</label>
+              <div class="detail-value">{{ review.fullname || 'نامشخص' }}</div>
+            </div>
+            
+            <div class="detail-group">
+              <label class="detail-label">شماره موبایل:</label>
+              <div class="detail-value">{{ review.mobile || 'نامشخص' }}</div>
             </div>
 
-            <div class="detail-section">
-              <h4 class="section-title">نظر و امتیاز</h4>
-              
-              <div class="detail-item">
-                <label class="detail-label">امتیاز:</label>
-                <div class="detail-value">
-                  <div class="rating-display">
-                    <div class="stars">
-                      <svg 
-                        v-for="star in 5" 
-                        :key="star" 
-                        class="star"
-                        :class="{ 'filled': star <= Math.round(review.rate) }"
-                        viewBox="0 0 24 24" 
-                        fill="currentColor"
-                      >
-                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                      </svg>
-                    </div>
-                    <span class="rating-text">{{ review.rate }}/5</span>
+            <div class="detail-group">
+              <label class="detail-label">امتیاز:</label>
+              <div class="detail-value">
+                <div class="rating-display">
+                  <div class="stars">
+                    <svg 
+                      v-for="star in 5" 
+                      :key="star" 
+                      class="star"
+                      :class="{ 'filled': star <= Math.round(review.rate) }"
+                      viewBox="0 0 24 24" 
+                      fill="currentColor"
+                    >
+                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    </svg>
                   </div>
-                </div>
-              </div>
-              
-              <div class="detail-item">
-                <label class="detail-label">متن نظر:</label>
-                <div class="detail-value description-text">
-                  {{ review.text || 'نظری ارائه نشده' }}
+                  <span class="rating-text">{{ review.rate }}/5</span>
                 </div>
               </div>
             </div>
-
-            <div v-if="review.answer" class="detail-section">
-              <h4 class="section-title">پاسخ</h4>
-              
-              <div class="detail-item">
-                <label class="detail-label">پاسخ:</label>
-                <div class="detail-value description-text answer-text">
-                  {{ review.answer }}
-                </div>
-              </div>
+            
+            <div class="detail-group">
+              <label class="detail-label">متن نظر:</label>
+              <div class="detail-value">{{ review.text || 'نظری ارائه نشده' }}</div>
             </div>
 
-            <div class="detail-section">
-              <h4 class="section-title">اطلاعات درخواست</h4>
-              
-              <div class="detail-item">
-                <label class="detail-label">وضعیت:</label>
-                <span class="detail-value">
-                  <StatusBadge :state="review.isAccept ? 'accepted' : 'pending'" />
-                </span>
+            <div v-if="review.answer" class="detail-group">
+              <label class="detail-label">پاسخ:</label>
+              <div class="detail-value answer-text">{{ review.answer }}</div>
+            </div>
+
+            <div class="detail-group">
+              <label class="detail-label">وضعیت:</label>
+              <div class="detail-value">
+                <StatusBadge :state="review.isAccept ? 'accepted' : 'pending'" />
               </div>
-              
-              <div class="detail-item">
-                <label class="detail-label">تاریخ ایجاد:</label>
-                <span class="detail-value">
-                  <FormattedDate :date="review.createDate" format="full" />
-                </span>
+            </div>
+            
+            <div class="detail-group">
+              <label class="detail-label">تاریخ ایجاد:</label>
+              <div class="detail-value">
+                <FormattedDate :date="review.createDate" format="full" />
               </div>
-              
-              <div v-if="review.modifyDate" class="detail-item">
-                <label class="detail-label">تاریخ آخرین تغییر:</label>
-                <span class="detail-value">
-                  <FormattedDate :date="review.modifyDate" format="full" />
-                </span>
+            </div>
+            
+            <div v-if="review.modifyDate" class="detail-group">
+              <label class="detail-label">تاریخ آخرین تغییر:</label>
+              <div class="detail-value">
+                <FormattedDate :date="review.modifyDate" format="full" />
               </div>
             </div>
           </div>
@@ -222,48 +202,27 @@ const closeDialog = () => {
   gap: 1.5rem;
 }
 
-.detail-section {
-  margin-bottom: 1.5rem;
-}
-
-.section-title {
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: #374151;
-  margin: 0 0 1rem 0;
-  padding-bottom: 0.5rem;
-  border-bottom: 2px solid #e5e7eb;
-}
-
-.detail-item {
+.detail-group {
   display: flex;
-  margin-bottom: 1rem;
-  padding: 0.75rem;
-  background-color: #f9fafb;
-  border-radius: 0.375rem;
-  transition: background-color 0.15s ease-in-out;
-}
-
-.detail-item:hover {
-  background-color: #f3f4f6;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .detail-label {
+  font-size: 0.875rem;
   font-weight: 600;
   color: #374151;
-  min-width: 140px;
-  margin-right: 0;
-  margin-left: 1rem;
+  margin: 0;
 }
 
 .detail-value {
+  font-size: 0.875rem;
   color: #6b7280;
-  flex: 1;
-}
-
-.description-text {
-  white-space: pre-wrap;
-  line-height: 1.6;
+  padding: 0.75rem;
+  background-color: #f9fafb;
+  border-radius: 0.375rem;
+  border: 1px solid #e5e7eb;
+  word-break: break-word;
 }
 
 .answer-text {
@@ -325,22 +284,17 @@ const closeDialog = () => {
 }
 
 .btn-close {
-  background: #f1f5f9;
-  color: #565758;
+  background: #636363;
+  color: #ffffff;
 }
 
 .btn-close:hover:not(:disabled) {
-  background: #e2e8f0;
-  color: #475569;
+  background: #4a4a4a;
   transform: translateY(-1px);
 }
 
 .dialog-header {
   flex-direction: row-reverse;
-}
-
-.detail-item {
-  flex-direction: row;
 }
 
 .dialog-footer {
@@ -359,13 +313,8 @@ const closeDialog = () => {
     padding: 1rem;
   }
   
-  .detail-item {
-    flex-direction: column;
-  }
-  
-  .detail-label {
-    margin-right: 0;
-    margin-bottom: 0.5rem;
+  .detail-group {
+    gap: 0.25rem;
   }
   
   .rating-display {

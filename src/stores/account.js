@@ -199,6 +199,15 @@ export const useAccountStore = defineStore('account', () => {
     }
   }
 
+  async function changePassword(payload) {
+    try {
+      const res = await accountService.changePassword(payload)
+      return res
+    } catch (error) {
+      throw error
+    }
+  }
+
   async function refreshAccessToken() {
     try {
       const res = await accountService.refreshToken(refreshToken.value)
@@ -257,6 +266,7 @@ export const useAccountStore = defineStore('account', () => {
     logout,
     readUserInfo,
     updateProfile,
+    changePassword,
     refreshAccessToken,
     initializeApp
   }

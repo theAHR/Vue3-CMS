@@ -14,40 +14,38 @@
 
         <!-- Dialog Body -->
         <div class="dialog-body">
-          <div v-if="fullFaqData">
-            <div class="detail-item">
+          <div v-if="fullFaqData" class="faq-details">
+            <div class="detail-group">
               <label class="detail-label">عنوان سوال:</label>
-              <span class="detail-value">{{ fullFaqData.faqTitle || 'نامشخص' }}</span>
+              <div class="detail-value">{{ fullFaqData.faqTitle || 'نامشخص' }}</div>
             </div>
 
-            <div class="detail-item">
+            <div class="detail-group">
               <label class="detail-label">پاسخ:</label>
-              <div class="detail-value detail-text">{{ fullFaqData.faqAnswer || 'بدون پاسخ' }}</div>
+              <div class="detail-value">{{ fullFaqData.faqAnswer || 'بدون پاسخ' }}</div>
             </div>
 
-            <div class="detail-item">
-              <label class="detail-label">وضعیت:</label>
-              <span 
-                :class="fullFaqData.active ? 'status-active' : 'status-inactive'"
-                class="detail-value status-badge"
-              >
-                {{ fullFaqData.active ? 'فعال' : 'غیرفعال' }}
-              </span>
-            </div>
+            <div class="details-grid">
+              <div class="detail-group">
+                <label class="detail-label">وضعیت:</label>
+                <div class="detail-value">
+                  <span 
+                    :class="fullFaqData.active ? 'status-active' : 'status-inactive'"
+                    class="status-badge"
+                  >
+                    {{ fullFaqData.active ? 'فعال' : 'غیرفعال' }}
+                  </span>
+                </div>
+              </div>
 
-            <div class="detail-item">
-              <label class="detail-label">دسته‌بندی سوال:</label>
-              <span class="detail-value">{{ categoryTitle || 'نامشخص' }}</span>
-            </div>
-
-            <div class="detail-item">
-              <label class="detail-label">تاریخ ایجاد:</label>
-              <span class="detail-value">{{ formattedDate || 'نامشخص' }}</span>
+              <div class="detail-group">
+                <label class="detail-label">دسته‌بندی سوال:</label>
+                <div class="detail-value">{{ categoryTitle || 'نامشخص' }}</div>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- Dialog Actions -->
         <div class="dialog-actions">
           <button class="btn btn-close" @click="closeDialog">
             <span>بستن</span>
@@ -205,50 +203,62 @@ watch(() => fullFaqData.value, (newVal) => {
 
 .dialog-body {
   padding: 1.5rem;
-  overflow: hidden;
+  overflow-y: auto;
   flex: 1;
+  max-height: calc(90vh - 160px);
 }
 
-.detail-item {
+.dialog-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dialog-body::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.dialog-body::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.dialog-body::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.faq-details {
   display: flex;
-  margin-bottom: 1rem;
-  padding: 0.75rem;
-  background-color: #f9fafb;
-  border-radius: 0.375rem;
-  transition: background-color 0.15s ease-in-out;
-}
-
-.detail-item:hover {
-  background-color: #f3f4f6;
-}
-
-.detail-item-full {
   flex-direction: column;
+  gap: 1.5rem;
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.detail-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .detail-label {
+  font-size: 0.875rem;
   font-weight: 600;
   color: #374151;
-  min-width: 120px;
-  margin-right: 0;
-  margin-left: 1rem;
-}
-
-.detail-item-full .detail-label {
-  margin-left: 0;
-  margin-bottom: 0.5rem;
+  margin: 0;
 }
 
 .detail-value {
+  font-size: 0.875rem;
   color: #6b7280;
-  flex: 1;
-}
-
-.detail-text {
-  white-space: pre-wrap;
-  line-height: 1.6;
-  max-height: 200px;
-  overflow-y: auto;
+  padding: 0.75rem;
+  background-color: #f9fafb;
+  border-radius: 0.375rem;
+  border: 1px solid #e5e7eb;
+  word-break: break-word;
 }
 
 .status-badge {
@@ -292,32 +302,18 @@ watch(() => fullFaqData.value, (newVal) => {
 }
 
 .btn-close {
-  background: #f1f5f9;
-  color: #64748b;
+  background: #636363;
+  color: #ffffff;
 }
 
 .btn-close:hover:not(:disabled) {
-  background: #e2e8f0;
-  color: #475569;
+  background: #4a4a4a;
   transform: translateY(-1px);
-}
-
-.btn-close:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
 }
 
 /* RTL specific adjustments */
 .dialog-header {
   flex-direction: row-reverse;
-}
-
-.detail-item {
-  flex-direction: row;
-}
-
-.detail-item-full {
-  flex-direction: column;
 }
 
 .dialog-actions {
@@ -337,13 +333,13 @@ watch(() => fullFaqData.value, (newVal) => {
     padding: 1rem;
   }
   
-  .detail-item {
-    flex-direction: column;
+  .detail-group {
+    gap: 0.25rem;
   }
-  
-  .detail-label {
-    margin-right: 0;
-    margin-bottom: 0.5rem;
+
+  .details-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
   }
 }
 

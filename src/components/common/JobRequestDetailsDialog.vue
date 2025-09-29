@@ -12,98 +12,81 @@
         </div>
 
         <div class="dialog-body">
-          <div class="detail-section">
-            <h4 class="section-title">اطلاعات متقاضی</h4>
-            
-            <div class="detail-item">
-              <label class="detail-label">نام کامل:</label>
-              <span class="detail-value">{{ jobRequest?.applicantFullName || 'نامشخص' }}</span>
+          <div class="job-request-details">
+            <div class="details-grid">
+              <div class="detail-group">
+                <label class="detail-label">نام کامل:</label>
+                <div class="detail-value">{{ jobRequest?.applicantFullName || 'نامشخص' }}</div>
+              </div>
+              
+              <div class="detail-group">
+                <label class="detail-label">شماره موبایل:</label>
+                <div class="detail-value">{{ jobRequest?.applicantMobileNumber || 'نامشخص' }}</div>
+              </div>
+              
+              <div class="detail-group">
+                <label class="detail-label">ایمیل:</label>
+                <div class="detail-value">{{ jobRequest?.applicantMail || 'نامشخص' }}</div>
+              </div>
+
+              <div class="detail-group">
+                <label class="detail-label">عنوان شغل:</label>
+                <div class="detail-value">{{ jobRequest?.job?.title || 'نامشخص' }}</div>
+              </div>
+
+              <div class="detail-group">
+                <label class="detail-label">وضعیت:</label>
+                <div class="detail-value">
+                  <StatusBadge :state="jobRequest?.state" />
+                </div>
+              </div>
+
+              <div v-if="jobRequest?.applicantResume" class="detail-group">
+                <label class="detail-label">فایل رزومه:</label>
+                <div class="detail-value">
+                  <a 
+                    :href="getResumeUrl(jobRequest.applicantResume)" 
+                    target="_blank" 
+                    class="resume-link"
+                  >
+                    <svg viewBox="0 0 24 24" fill="currentColor" class="download-icon">
+                      <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                    </svg>
+                    دانلود رزومه
+                  </a>
+                </div>
+              </div>
+              
+              <div class="detail-group">
+                <label class="detail-label">تاریخ ایجاد:</label>
+                <div class="detail-value">
+                  <FormattedDate :date="jobRequest?.createDate" format="full" />
+                </div>
+              </div>
+              
+              <div class="detail-group">
+                <label class="detail-label">تاریخ آخرین تغییر:</label>
+                <div class="detail-value">
+                  <FormattedDate v-if="jobRequest?.modifyDate" :date="jobRequest.modifyDate" format="full" />
+                  <span v-else>تغییری اعمال نشده</span>
+                </div>
+              </div>
+
             </div>
             
-            <div class="detail-item">
-              <label class="detail-label">شماره موبایل:</label>
-              <span class="detail-value">{{ jobRequest?.applicantMobileNumber || 'نامشخص' }}</span>
-            </div>
-            
-            <div class="detail-item">
-              <label class="detail-label">ایمیل:</label>
-              <span class="detail-value">{{ jobRequest?.applicantMail || 'نامشخص' }}</span>
-            </div>
-            
-            <div class="detail-item">
+            <div class="detail-group">
               <label class="detail-label">توضیحات:</label>
-              <div class="detail-value description-text">
-                {{ jobRequest?.applicantDescription || 'توضیحی ارائه نشده' }}
-              </div>
-            </div>
-          </div>
-
-          <div class="detail-section">
-            <h4 class="section-title">اطلاعات شغل</h4>
-            
-            <div class="detail-item">
-              <label class="detail-label">عنوان شغل:</label>
-              <span class="detail-value">{{ jobRequest?.job?.title || 'نامشخص' }}</span>
+              <div class="detail-value">{{ jobRequest?.applicantDescription || 'توضیحی ارائه نشده' }}</div>
             </div>
             
-            <div class="detail-item">
+            <div class="detail-group">
               <label class="detail-label">توضیحات شغل:</label>
-              <div class="detail-value description-text">
-                {{ jobRequest?.job?.description || 'توضیحی ارائه نشده' }}
-              </div>
+              <div class="detail-value">{{ jobRequest?.job?.description || 'توضیحی ارائه نشده' }}</div>
             </div>
             
-            <div class="detail-item">
+            <div class="detail-group">
               <label class="detail-label">الزامات:</label>
-              <div class="detail-value description-text">
-                {{ jobRequest?.job?.requirement || 'الزاماتی تعریف نشده' }}
-              </div>
-            </div>
-          </div>
-
-          <div class="detail-section">
-            <h4 class="section-title">اطلاعات درخواست</h4>
-            
-            <div class="detail-item">
-              <label class="detail-label">وضعیت:</label>
-              <span class="detail-value">
-                <StatusBadge :state="jobRequest?.state" />
-              </span>
-            </div>
-            
-            <div class="detail-item">
-              <label class="detail-label">تاریخ ایجاد:</label>
-              <span class="detail-value">
-                <FormattedDate :date="jobRequest?.createDate" format="full" />
-              </span>
-            </div>
-            
-            <div class="detail-item">
-              <label class="detail-label">تاریخ آخرین تغییر:</label>
-              <span class="detail-value">
-                <FormattedDate v-if="jobRequest?.modifyDate" :date="jobRequest.modifyDate" format="full" />
-                <span v-else>تغییری اعمال نشده</span>
-              </span>
-            </div>
-          </div>
-
-          <div v-if="jobRequest?.applicantResume" class="detail-section">
-            <h4 class="section-title">رزومه</h4>
-            
-            <div class="detail-item">
-              <label class="detail-label">فایل رزومه:</label>
-              <div class="detail-value">
-                <a 
-                  :href="getResumeUrl(jobRequest.applicantResume)" 
-                  target="_blank" 
-                  class="resume-link"
-                >
-                  <svg viewBox="0 0 24 24" fill="currentColor" class="download-icon">
-                    <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
-                  </svg>
-                  دانلود رزومه
-                </a>
-              </div>
+              <div class="detail-value">{{ jobRequest?.job?.requirement || 'الزاماتی تعریف نشده' }}</div>
             </div>
           </div>
         </div>
@@ -121,6 +104,7 @@
 <script setup>
 import FormattedDate from './FormattedDate.vue';
 import StatusBadge from './StatusBadge.vue';
+import { fileBaseURL } from '@/config/api';
 
 const props = defineProps({
   show: {
@@ -141,7 +125,7 @@ const closeDialog = () => {
 
 const getResumeUrl = (fileName) => {
   if (!fileName) return '#';
-  return `https://apilanding.trustedtsp.ir/files/${fileName}`;
+  return `${fileBaseURL}${fileName}`;
 };
 </script>
 
@@ -214,50 +198,60 @@ const getResumeUrl = (fileName) => {
   padding: 1.5rem;
   overflow-y: auto;
   flex: 1;
+  max-height: calc(90vh - 160px);
 }
 
-.detail-section {
-  margin-bottom: 2rem;
+.dialog-body::-webkit-scrollbar {
+  width: 6px;
 }
 
-.section-title {
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: #374151;
-  margin: 0 0 1rem 0;
-  padding-bottom: 0.5rem;
-  border-bottom: 2px solid #e5e7eb;
+.dialog-body::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
 }
 
-.detail-item {
+.dialog-body::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.dialog-body::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.job-request-details {
   display: flex;
-  margin-bottom: 1rem;
-  padding: 0.75rem;
-  background-color: #f9fafb;
-  border-radius: 0.375rem;
-  transition: background-color 0.15s ease-in-out;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
-.detail-item:hover {
-  background-color: #f3f4f6;
+.details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.detail-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .detail-label {
+  font-size: 0.875rem;
   font-weight: 600;
   color: #374151;
-  min-width: 140px;
-  margin-right: 0;
-  margin-left: 1rem;
+  margin: 0;
 }
 
 .detail-value {
+  font-size: 0.875rem;
   color: #6b7280;
-  flex: 1;
-}
-
-.description-text {
-  white-space: pre-wrap;
-  line-height: 1.6;
+  padding: 0.75rem;
+  background-color: #f9fafb;
+  border-radius: 0.375rem;
+  border: 1px solid #e5e7eb;
+  word-break: break-word;
 }
 
 .resume-link {
@@ -268,16 +262,15 @@ const getResumeUrl = (fileName) => {
   text-decoration: none;
   font-weight: 500;
   padding: 0.5rem 1rem;
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  background: linear-gradient(135deg, #9a9b9c 0%, #575757 100%);
   border-radius: 0.375rem;
   transition: all 0.2s ease-in-out;
   box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
 }
 
 .resume-link:hover {
-  background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 4px 12px rgba(109, 109, 109, 0.3);
 }
 
 .download-icon {
@@ -307,22 +300,17 @@ const getResumeUrl = (fileName) => {
 }
 
 .btn-close {
-  background: #f1f5f9;
-  color: #565758;
+  background: #636363;
+  color: #ffffff;
 }
 
 .btn-close:hover:not(:disabled) {
-  background: #e2e8f0;
-  color: #475569;
+  background: #4a4a4a;
   transform: translateY(-1px);
 }
 
 .dialog-header {
   flex-direction: row-reverse;
-}
-
-.detail-item {
-  flex-direction: row;
 }
 
 .dialog-actions {
@@ -341,13 +329,13 @@ const getResumeUrl = (fileName) => {
     padding: 1rem;
   }
   
-  .detail-item {
-    flex-direction: column;
+  .detail-group {
+    gap: 0.25rem;
   }
-  
-  .detail-label {
-    margin-right: 0;
-    margin-bottom: 0.5rem;
+
+  .details-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
   }
 }
 

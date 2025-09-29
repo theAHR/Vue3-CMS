@@ -13,63 +13,61 @@
 
         <div class="dialog-body">
           <div v-if="user" class="user-details">
-            <div class="detail-section">
-              <h4 class="section-title">اطلاعات شخصی</h4>
-              <div class="detail-grid">
-                <div class="detail-item">
-                  <label class="detail-label">نام:</label>
-                  <span class="detail-value">{{ user.name || '-' }}</span>
-                </div>
-                <div class="detail-item">
-                  <label class="detail-label">نام خانوادگی:</label>
-                  <span class="detail-value">{{ user.lastName || '-' }}</span>
-                </div>
-                <div class="detail-item">
-                  <label class="detail-label">نام کاربری:</label>
-                  <span class="detail-value">{{ user.username || '-' }}</span>
-                </div>
-                <div class="detail-item">
-                  <label class="detail-label">شماره موبایل:</label>
-                  <span class="detail-value">{{ user.mobileNo || '-' }}</span>
-                </div>
+            <div class="details-grid">
+              <div class="detail-group">
+                <label class="detail-label">نام:</label>
+                <div class="detail-value">{{ user.name || '-' }}</div>
               </div>
-            </div>
 
-            <div class="detail-section">
-              <h4 class="section-title">اطلاعات سیستمی</h4>
-              <div class="detail-grid">
-                <div class="detail-item">
-                  <label class="detail-label">نقش:</label>
-                  <span class="detail-value">{{ getRoleName(user.userRole) }}</span>
-                </div>
-                <div class="detail-item">
-                  <label class="detail-label">وضعیت:</label>
-                  <span class="detail-value">
-                    <span :class="['status-badge', user.active ? 'active' : 'inactive']">
-                      {{ user.active ? 'فعال' : 'غیرفعال' }}
-                    </span>
+              <div class="detail-group">
+                <label class="detail-label">نام خانوادگی:</label>
+                <div class="detail-value">{{ user.lastName || '-' }}</div>
+              </div>
+
+              <div class="detail-group">
+                <label class="detail-label">نام کاربری:</label>
+                <div class="detail-value">{{ user.username || '-' }}</div>
+              </div>
+
+              <div class="detail-group">
+                <label class="detail-label">شماره موبایل:</label>
+                <div class="detail-value">{{ user.mobileNo || '-' }}</div>
+              </div>
+
+              <div class="detail-group">
+                <label class="detail-label">نقش:</label>
+                <div class="detail-value">{{ getRoleName(user.userRole) }}</div>
+              </div>
+
+              <div class="detail-group">
+                <label class="detail-label">وضعیت:</label>
+                <div class="detail-value">
+                  <span :class="['status-badge', user.active ? 'active' : 'inactive']">
+                    {{ user.active ? 'فعال' : 'غیرفعال' }}
                   </span>
                 </div>
-                <div class="detail-item">
-                  <label class="detail-label">تاریخ ایجاد:</label>
-                  <span class="detail-value">{{ formatDate(user.createDate) }}</span>
-                </div>
-                <div class="detail-item">
-                  <label class="detail-label">آخرین ویرایش:</label>
-                  <span class="detail-value">{{ formatDate(user.modifyDate) }}</span>
-                </div>
+              </div>
+
+              <div class="detail-group">
+                <label class="detail-label">تاریخ ایجاد:</label>
+                <div class="detail-value">{{ formatDate(user.createDate) }}</div>
+              </div>
+
+              <div class="detail-group">
+                <label class="detail-label">آخرین ویرایش:</label>
+                <div class="detail-value">{{ formatDate(user.modifyDate) }}</div>
               </div>
             </div>
           </div>
-          
-          <div class="dialog-actions">
-            <button 
-              class="btn btn-cancel" 
-              @click="closeDialog"
-            >
-              بستن
-            </button>
-          </div>
+        </div>
+
+        <div class="dialog-footer">
+          <button 
+            class="btn btn-close" 
+            @click="closeDialog"
+          >
+            بستن
+          </button>
         </div>
       </div>
     </div>
@@ -208,53 +206,38 @@ const formatDate = (dateString) => {
 }
 
 .user-details {
-  margin-bottom: 2rem;
-}
-
-.detail-section {
-  margin-bottom: 2rem;
-}
-
-.detail-section:last-child {
-  margin-bottom: 0;
-}
-
-.section-title {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #374151;
-  margin: 0 0 1rem 0;
-  padding-bottom: 0.5rem;
-  border-bottom: 2px solid #e5e7eb;
-}
-
-.detail-grid {
-  display: grid;
-  gap: 1rem;
-}
-
-.detail-item {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.75rem;
-  background-color: #f9fafb;
-  border-radius: 0.375rem;
-  border: 1px solid #e5e7eb;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.detail-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .detail-label {
   font-size: 0.875rem;
-  font-weight: 500;
-  color: #6b7280;
-  min-width: 120px;
+  font-weight: 600;
+  color: #374151;
+  margin: 0;
 }
 
 .detail-value {
   font-size: 0.875rem;
-  color: #374151;
-  font-weight: 500;
-  text-align: left;
+  color: #6b7280;
+  padding: 0.75rem;
+  background-color: #f9fafb;
+  border-radius: 0.375rem;
+  border: 1px solid #e5e7eb;
+  word-break: break-word;
 }
 
 .status-badge {
@@ -276,12 +259,11 @@ const formatDate = (dateString) => {
   color: #dc2626;
 }
 
-.dialog-actions {
+.dialog-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #e5e7eb;
   display: flex;
   justify-content: flex-end;
-  margin-top: 2rem;
-  padding-top: 1rem;
-  border-top: 1px solid #e5e7eb;
 }
 
 .btn {
@@ -299,20 +281,21 @@ const formatDate = (dateString) => {
   min-width: 120px;
 }
 
-.btn-cancel {
+.btn-close {
   background: #636363;
   color: #ffffff;
 }
 
-.btn-cancel:hover {
+.btn-close:hover {
   background: #4a4a4a;
+  transform: translateY(-1px);
 }
 
 .dialog-header {
   flex-direction: row-reverse;
 }
 
-.dialog-actions {
+.dialog-footer {
   flex-direction: row-reverse;
 }
 
@@ -327,18 +310,13 @@ const formatDate = (dateString) => {
     padding: 1rem;
   }
   
-  .detail-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
+  .detail-group {
+    gap: 0.25rem;
   }
-  
-  .detail-label {
-    min-width: auto;
-  }
-  
-  .detail-value {
-    text-align: right;
+
+  .details-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
   }
 }
 

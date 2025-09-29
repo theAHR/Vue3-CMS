@@ -1,5 +1,5 @@
 <template>
-  <div class="v-select-container" :class="{ 'error': hasError, 'disabled': disabled }">
+  <div ref="containerRef" class="v-select-container" :class="{ 'error': hasError, 'disabled': disabled }">
     <div 
       class="v-select-wrapper"
       :class="{ 'open': isOpen, 'error': hasError, 'disabled': disabled }"
@@ -22,7 +22,13 @@
     </div>
 
     <Transition name="dropdown">
-      <div v-if="isOpen" class="v-select-dropdown">
+      <div 
+        v-if="isOpen" 
+        ref="dropdownRef"
+        class="v-select-dropdown"
+        :class="{ 'dropdown-up': dropdownUp, 'dropdown-down': !dropdownUp }"
+        :style="dropdownStyle"
+      >
         <div class="v-select-options">
           <div
             v-for="option in options"
@@ -56,7 +62,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
+import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue';
 
 const props = defineProps({
   modelValue: {
@@ -85,6 +91,9 @@ const emit = defineEmits(['update:modelValue', 'change']);
 
 const isOpen = ref(false);
 const dropdownRef = ref(null);
+const containerRef = ref(null);
+const dropdownUp = ref(false);
+const dropdownStyle = ref({});
 
 const hasError = computed(() => !!props.errorMessage);
 
@@ -92,9 +101,52 @@ const selectedOption = computed(() => {
   return props.options.find(option => option.value === props.modelValue) || null;
 });
 
-const toggleDropdown = () => {
+const calculateDropdownPosition = async () => {
+  if (!containerRef.value || !dropdownRef.value) return;
+  
+  await nextTick();
+  
+  const containerRect = containerRef.value.getBoundingClientRect();
+  const dropdownHeight = Math.min(300, props.options.length * 44 + 16); // Max 300px or calculated height
+  const viewportHeight = window.innerHeight;
+  const spaceBelow = viewportHeight - containerRect.bottom;
+  const spaceAbove = containerRect.top;
+  
+  // Determine if dropdown should open upward
+  dropdownUp.value = spaceBelow < dropdownHeight && spaceAbove > spaceBelow;
+  
+  // Calculate position
+  const left = containerRect.left;
+  const width = containerRect.width;
+  
+  if (dropdownUp.value) {
+    dropdownStyle.value = {
+      position: 'fixed',
+      bottom: `${viewportHeight - containerRect.top + 4}px`,
+      left: `${left}px`,
+      width: `${width}px`,
+      zIndex: 9999
+    };
+  } else {
+    dropdownStyle.value = {
+      position: 'fixed',
+      top: `${containerRect.bottom + 4}px`,
+      left: `${left}px`,
+      width: `${width}px`,
+      zIndex: 9999
+    };
+  }
+};
+
+const toggleDropdown = async () => {
   if (props.disabled) return;
-  isOpen.value = !isOpen.value;
+  
+  if (!isOpen.value) {
+    isOpen.value = true;
+    await calculateDropdownPosition();
+  } else {
+    isOpen.value = false;
+  }
 };
 
 const selectOption = (option) => {
@@ -106,7 +158,7 @@ const selectOption = (option) => {
 };
 
 const closeDropdown = (event) => {
-  if (dropdownRef.value && !dropdownRef.value.contains(event.target)) {
+  if (containerRef.value && !containerRef.value.contains(event.target)) {
     isOpen.value = false;
   }
 };
@@ -115,12 +167,22 @@ watch(() => props.modelValue, () => {
   isOpen.value = false;
 });
 
+watch(() => isOpen.value, async (newVal) => {
+  if (newVal) {
+    await calculateDropdownPosition();
+  }
+});
+
 onMounted(() => {
   document.addEventListener('click', closeDropdown);
+  window.addEventListener('resize', calculateDropdownPosition);
+  window.addEventListener('scroll', calculateDropdownPosition, true);
 });
 
 onUnmounted(() => {
   document.removeEventListener('click', closeDropdown);
+  window.removeEventListener('resize', calculateDropdownPosition);
+  window.removeEventListener('scroll', calculateDropdownPosition, true);
 });
 </script>
 
@@ -207,18 +269,21 @@ onUnmounted(() => {
 }
 
 .v-select-dropdown {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
   background: white;
   border: 1px solid #d1d5db;
   border-radius: 0.5rem;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  z-index: 50;
-  margin-top: 0.25rem;
-  max-height: 200px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  max-height: 300px;
   overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.v-select-dropdown.dropdown-down {
+  margin-top: 0.25rem;
+}
+
+.v-select-dropdown.dropdown-up {
+  margin-bottom: 0.25rem;
 }
 
 .v-select-options {
@@ -331,21 +396,27 @@ onUnmounted(() => {
 }
 
 .v-select-dropdown::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
 }
 
 .v-select-dropdown::-webkit-scrollbar-track {
-  background: #f1f5f9;
-  border-radius: 3px;
+  background: #f8fafc;
+  border-radius: 4px;
+  margin: 4px 0;
 }
 
 .v-select-dropdown::-webkit-scrollbar-thumb {
   background: #cbd5e1;
-  border-radius: 3px;
+  border-radius: 4px;
+  border: 2px solid #f8fafc;
 }
 
 .v-select-dropdown::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
+}
+
+.v-select-dropdown::-webkit-scrollbar-thumb:active {
+  background: #64748b;
 }
 
 @media (max-width: 640px) {
@@ -355,10 +426,19 @@ onUnmounted(() => {
   
   .v-select-option {
     padding: 0.625rem 0.75rem;
+    min-height: 40px;
   }
   
   .option-text {
     font-size: 0.8125rem;
+  }
+  
+  .v-select-dropdown {
+    max-height: 250px;
+  }
+  
+  .v-select-dropdown::-webkit-scrollbar {
+    width: 6px;
   }
 }
 </style>

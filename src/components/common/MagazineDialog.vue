@@ -193,6 +193,7 @@ import { attachmentService } from '@/services/api/attachment';
 import { magazineCategoryService } from '@/services/api/magazineCategory';
 import { magazineService } from '@/services/api/magazine';
 import { useSnackbar } from '@/utils/snackbar';
+import { imageBaseURL } from '@/config/api';
 import VSelect from './VSelect.vue';
 
 const props = defineProps({
@@ -230,7 +231,7 @@ const getMagazineTypeTitle = (type) => {
     3: 'بخشنامه',
     4: 'راهنما'
   };
-  return titles[type] || 'مجله';
+  return titles[type] || 'محتوا';
 };
 
 const dialogTitle = computed(() => {
@@ -281,7 +282,7 @@ const fetchMagazineById = async (id) => {
       await fetchCategories();
     }
   } catch (err) {
-    error('خطا در دریافت اطلاعات مجله');
+    error('خطا در دریافت اطلاعات محتوا');
   } finally {
     isLoadingMagazine.value = false;
   }
@@ -349,7 +350,7 @@ const getImagePreviewUrl = (imageData) => {
   
   if (!imageName) return '';
   
-  return `https://apilanding.trustedtsp.ir/images/${imageName}`;
+  return `${imageBaseURL}${imageName}`;
 };
 
 
