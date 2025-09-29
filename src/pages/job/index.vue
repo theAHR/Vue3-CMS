@@ -59,8 +59,9 @@
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue';
+import { computed, onMounted, watch } from 'vue';
 import { storeToRefs } from 'pinia';
+import { useRoute } from 'vue-router';
 import Title from '@/components/common/Title.vue';
 import VDataTable from '@/components/common/VDataTable.vue';
 import JobDialog from '@/components/common/JobDialog.vue';
@@ -73,6 +74,7 @@ import { useSnackbar } from '@/utils/snackbar';
 const { success, error } = useSnackbar();
 const jobStore = useJobStore();
 const jobSectionStore = useJobSectionStore();
+const route = useRoute();
 
 const {
   data: jobs,
@@ -174,6 +176,12 @@ const handleSubmit = async (formData) => {
     error('خطا در ذخیره شغل');
   }
 };
+
+watch(() => route.query.add, (shouldAdd) => {
+  if (shouldAdd === 'true') {
+    showAddDialog();
+  }
+}, { immediate: true });
 
 onMounted(async () => {
   try {

@@ -20,7 +20,7 @@
     >
       <template #actions>
         <Button 
-          text="افزودن مجله"
+          :text="addButtonText"
           variant="success"
           iconSrc="/src/assets/img/icons/add.svg"
           @click="showAddDialog"
@@ -39,7 +39,7 @@
 
     <ConfirmDialog
       v-model="showDeleteConfirm"
-      title="حذف مجله"
+      :title="`حذف ${getMagazineTypeTitle(magazineType)}`"
       :message="deleteConfirmMessage"
       confirm-text="حذف"
       cancel-text="انصراف"
@@ -59,8 +59,9 @@
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue';
+import { computed, onMounted, watch } from 'vue';
 import { storeToRefs } from 'pinia';
+import { useRoute } from 'vue-router';
 import Title from '@/components/common/Title.vue';
 import VDataTable from '@/components/common/VDataTable.vue';
 import MagazineDialog from '@/components/common/MagazineDialog.vue';
@@ -75,8 +76,24 @@ const props = defineProps({
   magazineType: { type: Number, required: true }
 });
 
+const getMagazineTypeTitle = (type) => {
+  const titles = {
+    1: 'خبر',
+    2: 'اطلاعیه',
+    3: 'بخشنامه',
+    4: 'راهنما'
+  };
+  return titles[type] || 'مجله';
+};
+
+const addButtonText = computed(() => {
+  const typeTitle = getMagazineTypeTitle(props.magazineType);
+  return `افزودن ${typeTitle}`;
+});
+
 const { success, error } = useSnackbar();
 const magazineStore = useMagazineStore();
+const route = useRoute();
 
 const {
   data: magazines,
@@ -94,8 +111,9 @@ const {
 } = storeToRefs(magazineStore);
 
 const deleteConfirmMessage = computed(() => {
-  if (!magazineToDelete.value) return 'آیا از حذف این مجله اطمینان دارید؟';
-  return `آیا از حذف مجله "${magazineToDelete.value.title}" اطمینان دارید؟`;
+  const typeTitle = getMagazineTypeTitle(props.magazineType);
+  if (!magazineToDelete.value) return `آیا از حذف این ${typeTitle} اطمینان دارید؟`;
+  return `آیا از حذف ${typeTitle} "${magazineToDelete.value.title}" اطمینان دارید؟`;
 });
 
 const tableColumns = [
@@ -183,6 +201,12 @@ const handleSubmit = async (formData) => {
     error('خطا در ذخیره مجله');
   }
 };
+
+watch(() => route.query.add, (shouldAdd) => {
+  if (shouldAdd === 'true') {
+    showAddDialog();
+  }
+}, { immediate: true });
 
 onMounted(async () => {
   try {

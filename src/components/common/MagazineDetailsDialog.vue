@@ -9,7 +9,7 @@
               <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
             </svg>
           </button>
-          <h3 class="dialog-title">جزئیات مجله</h3>
+          <h3 class="dialog-title">{{ dialogTitle }}</h3>
         </div>
 
         <!-- Dialog Body -->
@@ -127,6 +127,21 @@ const showFullscreenImage = ref(false);
 const fullscreenImageUrl = ref('');
 const categoryTitle = ref('');
 const fullMagazineData = ref(null);
+
+const getMagazineTypeTitle = (type) => {
+  const titles = {
+    1: 'خبر',
+    2: 'اطلاعیه',
+    3: 'بخشنامه',
+    4: 'راهنما'
+  };
+  return titles[type] || 'مجله';
+};
+
+const dialogTitle = computed(() => {
+  const typeTitle = getMagazineTypeTitle(props.magazineType);
+  return `جزئیات ${typeTitle}`;
+});
 
 const formattedDate = computed(() => {
   const magazineData = fullMagazineData.value || props.magazine;

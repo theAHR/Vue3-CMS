@@ -13,6 +13,7 @@ import magazineService from './magazine'
 import magazineCategoryService from './magazineCategory'
 import multimediaService from './multimedia'
 import rateAndReviewService from './rateAndReview'
+import reportService from './report'
 import roleService from './role'
 import socialNetworkService from './socialNetwork'
 import userService from './user'
@@ -31,6 +32,7 @@ export {
   magazineCategoryService,
   multimediaService,
   rateAndReviewService,
+  reportService,
   roleService,
   socialNetworkService,
   userService
@@ -50,6 +52,7 @@ export default {
   magazineCategory: magazineCategoryService,
   multimedia: multimediaService,
   rateAndReview: rateAndReviewService,
+  report: reportService,
   role: roleService,
   socialNetwork: socialNetworkService,
   user: userService
